@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -125,8 +126,8 @@ export default function UsersPage() {
                 {filteredUsers.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      <button
-                        onClick={() => handleEdit(user)}
+                      <Link
+                        href={`/admin/users/${user.id}`}
                         className="flex items-center gap-3 text-left group"
                       >
                         <Avatar>
@@ -134,7 +135,7 @@ export default function UsersPage() {
                           <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
                         <span className="font-medium group-hover:underline">{user.name}</span>
-                      </button>
+                      </Link>
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.joinDate}</TableCell>
