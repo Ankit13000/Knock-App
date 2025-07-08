@@ -15,6 +15,8 @@ import { UserForm } from '@/components/admin/UserForm';
 import type { User, Transaction } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { BanUserForm } from '@/components/admin/BanUserForm';
+import { sendNotification } from '@/ai/flows/send-notification-flow';
 
 export default function UserDetailsPage() {
     const params = useParams();
@@ -22,6 +24,7 @@ export default function UserDetailsPage() {
     const { users, transactions, updateUser, addTransaction } = useApp();
     const { toast } = useToast();
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isBanFormOpen, setIsBanFormOpen] = useState(false);
 
     const userId = params.id as string;
     const user = users.find(u => u.id === userId);
@@ -72,6 +75,44 @@ export default function UserDetailsPage() {
       router.push('/home');
     };
 
+    const handleBanUser = () => {
+        setIsBanFormOpen(true);
+    };
+
+    const handleUnbanUser = (userId: string) => {
+        const userToUnban = users.find(u => u.id === userId);
+        if (!userToUnban) return;
+        updateUser({ ...userToUnban, isBanned: false, banReason: undefined, banExpiresAt: null });
+        toast({ title: 'User Unbanned', description: `${userToUnban.name} has been unbanned.` });
+    };
+
+    const handleConfirmBan = async (userId: string, reason: string, durationDays: number) => {
+        const userToBan = users.find(u => u.id === userId);
+        if (!userToBan) return;
+
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + durationDays);
+
+        updateUser({
+            ...userToBan,
+            isBanned: true,
+            banReason: reason,
+            banExpiresAt: expiryDate.toISOString().split('T')[0],
+        });
+
+        try {
+            await sendNotification({
+                title: "Account Suspended",
+                message: `Your account has been temporarily suspended for ${durationDays} days. Reason: ${reason}. Your access will be restored on ${expiryDate.toLocaleDateString()}.`,
+            });
+            toast({ title: "User Banned", description: `${userToBan.name} has been banned for ${durationDays} days.` });
+        } catch (error) {
+            toast({ variant: 'destructive', title: "Notification Failed", description: "The user was banned, but the notification could not be sent." });
+        }
+        
+        setIsBanFormOpen(false);
+    };
+
 
     const stats = [
         { label: 'Wallet Balance', value: `₹${user.walletBalance.toLocaleString()}`, icon: Wallet },
@@ -97,6 +138,17 @@ export default function UserDetailsPage() {
                         <LogIn className="mr-2 h-4 w-4" />
                         Login as User
                     </Button>
+                     {user.isBanned ? (
+                        <Button variant="outline" className="border-positive text-positive hover:bg-positive/10 hover:text-positive" onClick={() => handleUnbanUser(user.id)}>
+                            <Ban className="mr-2 h-4 w-4" />
+                            Unban User
+                        </Button>
+                    ) : (
+                        <Button variant="destructive" onClick={handleBanUser}>
+                            <Ban className="mr-2 h-4 w-4" />
+                            Ban User
+                        </Button>
+                    )}
                     <Button onClick={() => setIsFormOpen(true)}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit User
@@ -213,6 +265,12 @@ export default function UserDetailsPage() {
             onOpenChange={setIsFormOpen}
             onSave={handleSave}
             onAddFunds={handleAddFunds}
+            user={user}
+        />
+        <BanUserForm
+            isOpen={isBanFormOpen}
+            onOpenChange={setIsBanFormOpen}
+            onSave={handleConfirmBan}
             user={user}
         />
         </>
