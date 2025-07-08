@@ -1,11 +1,15 @@
+'use client';
+
 import Link from 'next/link';
-import { Zap, Mail } from 'lucide-react';
+import { Zap, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -18,6 +22,17 @@ const GoogleIcon = () => (
 
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real app, you'd create a user account here
+    router.push('/home');
+  };
+
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-grid-pattern p-4">
       <Card className="w-full max-w-md shadow-2xl shadow-primary/10">
@@ -27,21 +42,27 @@ export default function SignUpPage() {
           <CardDescription>Create an account to join the competition.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-4">
+          <form onSubmit={handleSignUp} className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input id="name" type="text" placeholder="Alex Ray" required value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
             <div className="space-y-2">
                 <Label htmlFor="email">Email or Mobile Number</Label>
-                <Input id="email" type="email" placeholder="you@example.com" required />
+                <Input id="email" type="email" placeholder="you@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="coupon">Coupon Code (Optional)</Label>
               <Input id="coupon" placeholder="Have a referral code?" />
             </div>
-            <Link href="/home" className="w-full">
-                <Button className="w-full btn-gradient">
-                    <Mail className="mr-2 h-4 w-4" /> Continue with Email
-                </Button>
-            </Link>
-          </div>
+            <Button type="submit" className="w-full btn-gradient">
+                <UserPlus className="mr-2 h-4 w-4" /> Create Account
+            </Button>
+          </form>
           <div className="flex items-center space-x-2">
             <Separator className="flex-1" />
             <span className="text-xs text-muted-foreground">OR</span>

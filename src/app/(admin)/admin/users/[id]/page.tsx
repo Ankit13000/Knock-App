@@ -7,13 +7,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, Edit, Wallet, Gamepad2, Trophy, DollarSign, Users } from 'lucide-react';
+import { ArrowLeft, Edit, Wallet, Gamepad2, Trophy, DollarSign, Users, Ban, LogIn } from 'lucide-react';
 import { getInitials, cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
 import { UserForm } from '@/components/admin/UserForm';
 import type { User, Transaction } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 export default function UserDetailsPage() {
     const params = useParams();
@@ -66,6 +67,11 @@ export default function UserDetailsPage() {
         toast({ title: 'Funds Added', description: `₹${amount.toLocaleString()} added to ${userToUpdate.name}'s wallet.` });
     };
 
+    const handleLoginAsUser = (user: User) => {
+      toast({ title: 'Impersonating User', description: `You are now logged in as ${user.name}.` });
+      router.push('/home');
+    };
+
 
     const stats = [
         { label: 'Wallet Balance', value: `₹${user.walletBalance.toLocaleString()}`, icon: Wallet },
@@ -77,7 +83,7 @@ export default function UserDetailsPage() {
     return (
         <>
         <div className="space-y-8">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <Button variant="ghost" onClick={() => router.back()} className="mb-4 -ml-4">
                         <ArrowLeft className="mr-2 h-4 w-4" />
@@ -86,11 +92,37 @@ export default function UserDetailsPage() {
                     <h1 className="text-3xl font-bold tracking-tighter">User Details</h1>
                     <p className="text-muted-foreground">Comprehensive overview of {user.name}.</p>
                 </div>
-                <Button onClick={() => setIsFormOpen(true)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit User
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => handleLoginAsUser(user)}>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Login as User
+                    </Button>
+                    <Button onClick={() => setIsFormOpen(true)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit User
+                    </Button>
+                </div>
             </div>
+
+            {user.isBanned && (
+                <Card className="border-destructive bg-destructive/5">
+                    <CardHeader>
+                        <CardTitle className="text-destructive flex items-center gap-2">
+                            <Ban className="h-5 w-5" />
+                            User Banned
+                        </CardTitle>
+                        <CardDescription className="text-destructive/80">
+                            This user's account is suspended.
+                        </CardDescription>
+                    </CardHeader>
+                    {user.banReason && (
+                         <CardContent className="text-sm">
+                            <p><strong>Reason:</strong> {user.banReason}</p>
+                            <p><strong>Ban Expires:</strong> {user.banExpiresAt ? new Date(user.banExpiresAt).toLocaleDateString() : 'N/A'}</p>
+                        </CardContent>
+                    )}
+                </Card>
+            )}
 
             <Card>
                 <CardHeader className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
@@ -99,7 +131,10 @@ export default function UserDetailsPage() {
                         <AvatarFallback className="text-3xl">{getInitials(user.name)}</AvatarFallback>
                     </Avatar>
                     <div className="text-center sm:text-left">
-                        <CardTitle className="text-2xl">{user.name}</CardTitle>
+                        <CardTitle className="text-2xl flex items-center gap-2">
+                          {user.name}
+                          {user.isBanned && <Badge variant="destructive">Banned</Badge>}
+                        </CardTitle>
                         <CardDescription>{user.email}</CardDescription>
                         <p className="text-sm text-muted-foreground mt-1">Joined on {user.joinDate}</p>
                     </div>
