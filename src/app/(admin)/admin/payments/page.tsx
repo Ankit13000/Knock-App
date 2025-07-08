@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useApp } from '@/context/AppContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { ArrowDownLeft, ArrowUpRight, DollarSign, PlusCircle } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, DollarSign, FilterX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Transaction, User } from '@/lib/types';
 import { GlobalAddFundsForm } from '@/components/admin/GlobalAddFundsForm';
@@ -14,7 +14,19 @@ import { useToast } from '@/hooks/use-toast';
 export default function PaymentsPage() {
   const { users, transactions, updateTransaction, updateUser, addTransaction } = useApp();
   const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const filteredTransactions = useMemo(() => {
+    if (!selectedUserId) return transactions;
+    return transactions.filter(tx => tx.userId === selectedUserId);
+  }, [transactions, selectedUserId]);
+
+  const selectedUserName = useMemo(() => {
+    if (!selectedUserId) return null;
+    return users.find(u => u.id === selectedUserId)?.name || null;
+  }, [users, selectedUserId]);
+
 
   const handleUpdateStatus = (tx: Transaction, status: 'Completed' | 'Failed') => {
     updateTransaction({ ...tx, status });
@@ -58,8 +70,20 @@ export default function PaymentsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>All Transactions</CardTitle>
-            <CardDescription>A log of all payments, withdrawals, and fees.</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>{selectedUserName ? `Transactions for ${selectedUserName}` : 'All Transactions'}</CardTitle>
+                <CardDescription>
+                  {selectedUserName ? 'A log of all payments for this user.' : 'A log of all payments, withdrawals, and fees. Click a user to filter.'}
+                </CardDescription>
+              </div>
+              {selectedUserId && (
+                <Button variant="outline" onClick={() => setSelectedUserId(null)}>
+                  <FilterX className="mr-2 h-4 w-4" />
+                  Clear Filter
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -74,10 +98,17 @@ export default function PaymentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((tx) => (
+                {filteredTransactions.map((tx) => (
                   <TableRow key={tx.id}>
                     <TableCell>
-                      <span className="font-medium">{tx.userName}</span>
+                      <Button
+                        variant="link"
+                        onClick={() => setSelectedUserId(tx.userId)}
+                        className="p-0 h-auto font-medium text-left text-foreground hover:underline"
+                        disabled={selectedUserId === tx.userId}
+                      >
+                        {tx.userName}
+                      </Button>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
