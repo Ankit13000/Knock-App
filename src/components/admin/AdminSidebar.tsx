@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard, Gamepad2, Bell } from 'lucide-react';
+import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard, Gamepad2, Bell, Plug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { href: '/admin/users', icon: Users, label: 'Users' },
   { href: '/admin/stats', icon: BarChartHorizontal, label: 'Statistics' },
   { href: '/admin/payments', icon: CreditCard, label: 'Payments' },
+  { href: '/admin/integrations', icon: Plug, label: 'Integrations' },
   { href: '/admin/notifications', icon: Bell, label: 'Notifications' },
 ];
 
