@@ -22,7 +22,10 @@ export type Transaction = {
 };
 
 export type User = {
+  id: string;
   name: string;
+  email: string;
+  joinDate: string;
   avatar: string | null;
   walletBalance: number;
   wins: number;

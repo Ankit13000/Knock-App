@@ -1,13 +1,54 @@
 import type { Competition, Transaction, User, LeaderboardEntry } from './types';
 
 export const mockUser: User = {
+  id: 'usr_1',
   name: 'Alex Ray',
+  email: 'alex.ray@example.com',
+  joinDate: '2024-06-15',
   avatar: null,
   walletBalance: 1250.75,
   wins: 12,
   totalGames: 48,
   totalEarned: 5500,
 };
+
+export const mockAdminUsers: User[] = [
+  mockUser,
+  {
+    id: 'usr_2',
+    name: 'Bethany Frank',
+    email: 'beth.f@example.com',
+    joinDate: '2024-07-01',
+    avatar: 'https://placehold.co/40x40.png',
+    walletBalance: 500.00,
+    wins: 5,
+    totalGames: 20,
+    totalEarned: 1200,
+  },
+  {
+    id: 'usr_3',
+    name: 'Charlie Day',
+    email: 'charlie.d@example.com',
+    joinDate: '2024-07-20',
+    avatar: 'https://placehold.co/40x40.png',
+    walletBalance: 75.50,
+    wins: 1,
+    totalGames: 10,
+    totalEarned: 150,
+  },
+  {
+    id: 'usr_4',
+    name: 'Diana Prince',
+    email: 'diana.p@example.com',
+    joinDate: '2024-05-10',
+    avatar: 'https://placehold.co/40x40.png',
+    walletBalance: 10000,
+    wins: 150,
+    totalGames: 200,
+    totalEarned: 50000,
+  },
+];
+
 
 export const mockCompetitions: Competition[] = [
   {
