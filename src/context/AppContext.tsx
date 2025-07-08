@@ -20,6 +20,8 @@ interface AppContextType {
   addGameType: (gameType: GameType) => void;
   updateGameType: (gameType: GameType) => void;
   deleteGameType: (id: string) => void;
+  isGlobalBanFormOpen: boolean;
+  setIsGlobalBanFormOpen: (isOpen: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -29,6 +31,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<User[]>(mockAdminUsers);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const [gameTypes, setGameTypes] = useState<GameType[]>(mockGameTypes);
+  const [isGlobalBanFormOpen, setIsGlobalBanFormOpen] = useState(false);
 
   const addCompetition = (competition: Competition) => {
     setCompetitions(prev => [competition, ...prev]);
@@ -90,6 +93,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addGameType,
     updateGameType,
     deleteGameType,
+    isGlobalBanFormOpen,
+    setIsGlobalBanFormOpen,
   };
 
   return (

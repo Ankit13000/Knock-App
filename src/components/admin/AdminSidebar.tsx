@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard, Gamepad2, Bell, Plug } from 'lucide-react';
+import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard, Gamepad2, Bell, Plug, Ban } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useApp } from '@/context/AppContext';
+import { Separator } from '@/components/ui/separator';
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -18,6 +20,7 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { setIsGlobalBanFormOpen } = useApp();
 
   return (
     <aside className="hidden sm:fixed sm:inset-y-0 sm:flex sm:w-56 sm:flex-col sm:border-r">
@@ -48,6 +51,16 @@ export function AdminSidebar() {
                 </li>
               );
             })}
+            <Separator className="my-2" />
+            <li>
+              <button
+                onClick={() => setIsGlobalBanFormOpen(true)}
+                className="group flex w-full gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-destructive hover:bg-destructive/10"
+              >
+                <Ban className="h-5 w-5 shrink-0" aria-hidden="true" />
+                Ban a User
+              </button>
+            </li>
           </ul>
         </nav>
       </div>
