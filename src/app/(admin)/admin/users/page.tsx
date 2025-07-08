@@ -149,7 +149,7 @@ export default function UsersPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(user)}>
                               <Edit className="mr-2 h-4 w-4" />
-                              <span>Edit / Add Funds</span>
+                              <span>Edit</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                              <AlertDialog>
