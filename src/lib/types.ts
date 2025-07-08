@@ -23,7 +23,7 @@ export type Transaction = {
 
 export type User = {
   name: string;
-  avatar: string;
+  avatar: string | null;
   walletBalance: number;
   wins: number;
   totalGames: number;
@@ -35,5 +35,5 @@ export type LeaderboardEntry = {
   name: string;
   score: number;
   prize: number;
-  avatar: string;
+  avatar: string | null;
 };

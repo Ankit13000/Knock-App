@@ -29,7 +29,7 @@ export default function LeaderboardPage() {
             <TableCell>
               <div className="flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src={entry.avatar} alt={entry.name} />
+                  <AvatarImage src={entry.avatar || undefined} alt={entry.name} />
                   <AvatarFallback>{entry.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <span className="font-medium">{entry.name}</span>

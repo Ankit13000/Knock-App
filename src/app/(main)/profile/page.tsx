@@ -12,15 +12,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { mockUser } from '@/lib/mock-data';
+import { useUser } from '@/context/UserContext';
 import { Camera, Edit, Gamepad2, LogOut, ShieldCheck, Trash2, Trophy, Wallet } from 'lucide-react';
 import React from 'react';
-
-const stats = [
-  { icon: Gamepad2, label: 'Total Games', value: mockUser.totalGames },
-  { icon: Trophy, label: 'Wins', value: mockUser.wins },
-  { icon: Wallet, label: 'Total Earned', value: `₹${mockUser.totalEarned.toLocaleString()}`},
-];
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -28,25 +22,30 @@ const profileFormSchema = z.object({
 
 
 export default function ProfilePage() {
+  const { user, setUser } = useUser();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [userName, setUserName] = useState(mockUser.name);
-  const [avatar, setAvatar] = useState<string | null>(mockUser.avatar);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const stats = [
+    { icon: Gamepad2, label: 'Total Games', value: user.totalGames },
+    { icon: Trophy, label: 'Wins', value: user.wins },
+    { icon: Wallet, label: 'Total Earned', value: `₹${user.totalEarned.toLocaleString()}`},
+  ];
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: userName,
+      name: user.name,
     },
   });
 
   useEffect(() => {
-    form.reset({ name: userName });
-  }, [userName, form]);
+    form.reset({ name: user.name });
+  }, [user.name, form]);
 
   function onSubmit(values: z.infer<typeof profileFormSchema>) {
-    setUserName(values.name);
+    setUser(prevUser => ({...prevUser, name: values.name}));
     toast({
       title: "Profile Updated",
       description: "Your name has been successfully updated.",
@@ -59,7 +58,7 @@ export default function ProfilePage() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatar(reader.result as string);
+        setUser(prevUser => ({...prevUser, avatar: reader.result as string}));
         toast({
           title: "Profile Picture Updated",
           description: "Your new picture has been saved.",
@@ -70,7 +69,7 @@ export default function ProfilePage() {
   };
   
   const handleRemoveAvatar = () => {
-    setAvatar(null);
+    setUser(prevUser => ({...prevUser, avatar: null}));
     toast({
       title: "Profile Picture Removed",
       description: "Your default avatar will be shown.",
@@ -88,10 +87,10 @@ export default function ProfilePage() {
       <Card>
         <CardHeader className="text-center">
             <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary">
-                <AvatarImage src={avatar || undefined} alt={userName} />
-                <AvatarFallback className="text-3xl">{userName.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <CardTitle className="text-2xl">{userName}</CardTitle>
+            <CardTitle className="text-2xl">{user.name}</CardTitle>
             <CardDescription className="flex items-center justify-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-green-500" />
                 Verified Player
@@ -127,14 +126,14 @@ export default function ProfilePage() {
                   <div className="py-4 space-y-4">
                      <div className="flex items-center gap-4">
                         <Avatar className="w-16 h-16">
-                            <AvatarImage src={avatar || undefined} alt={userName} />
-                            <AvatarFallback className="text-2xl">{userName.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                            <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col gap-2">
                            <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
                              <Camera className="mr-2 h-4 w-4" /> Change Picture
                            </Button>
-                           <Button variant="ghost" size="sm" onClick={handleRemoveAvatar} disabled={!avatar}>
+                           <Button variant="ghost" size="sm" onClick={handleRemoveAvatar} disabled={!user.avatar}>
                              <Trash2 className="mr-2 h-4 w-4" /> Remove
                            </Button>
                            <input 
