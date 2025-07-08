@@ -52,6 +52,10 @@ export default {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
+        positive: {
+          DEFAULT: 'hsl(var(--positive))',
+          foreground: 'hsl(var(--positive-foreground))',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -102,7 +106,7 @@ export default {
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
       },
       backgroundImage: {
-        'grid-pattern': "radial-gradient(circle at 25px 25px, hsl(var(--primary) / 0.05) 2%, transparent 0%), radial-gradient(circle at 75px 75px, hsl(var(--accent) / 0.05) 2%, transparent 0%)",
+        'grid-pattern': "radial-gradient(circle at 25px 25px, hsl(var(--primary) / 0.1) 2%, transparent 0%), radial-gradient(circle at 75px 75px, hsl(var(--accent) / 0.1) 2%, transparent 0%)",
       },
       backgroundSize: {
         'grid-pattern': "100px 100px",

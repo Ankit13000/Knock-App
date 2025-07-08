@@ -22,7 +22,7 @@ export default function LeaderboardPage() {
           <TableRow key={entry.rank} className={cn(entry.name === mockUser.name && 'bg-primary/10')}>
             <TableCell className="font-bold text-lg">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-card">
-                    {index === 0 && <Crown className="w-6 h-6 text-amber-400" />}
+                    {index === 0 && <Crown className="w-6 h-6 text-accent" />}
                     {index > 0 && entry.rank}
                 </div>
             </TableCell>
@@ -36,7 +36,7 @@ export default function LeaderboardPage() {
               </div>
             </TableCell>
             <TableCell className="text-right font-mono">{entry.score.toLocaleString()}</TableCell>
-            <TableCell className="text-right font-semibold text-green-400">₹{entry.prize.toLocaleString()}</TableCell>
+            <TableCell className="text-right font-semibold text-positive">₹{entry.prize.toLocaleString()}</TableCell>
           </TableRow>
         ))}
       </TableBody>

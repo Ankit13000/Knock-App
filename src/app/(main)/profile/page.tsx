@@ -99,7 +99,7 @@ export default function ProfilePage() {
             </Avatar>
             <CardTitle className="text-2xl">{user.name}</CardTitle>
             <CardDescription className="flex items-center justify-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-green-500" />
+                <ShieldCheck className="w-4 h-4 text-positive" />
                 Verified Player
             </CardDescription>
         </CardHeader>

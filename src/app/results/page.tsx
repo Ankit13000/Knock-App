@@ -11,15 +11,15 @@ export default function ResultsPage() {
 
   const stats = [
     { icon: CheckCircle, label: 'Your Score', value: score.toLocaleString(), color: 'text-accent' },
-    { icon: Trophy, label: 'Your Rank', value: `#${rank}`, color: 'text-amber-400' },
-    { icon: Award, label: 'Winnings', value: `₹${winnings.toLocaleString()}`, color: 'text-green-400' },
+    { icon: Trophy, label: 'Your Rank', value: `#${rank}`, color: 'text-accent' },
+    { icon: Award, label: 'Winnings', value: `₹${winnings.toLocaleString()}`, color: 'text-positive' },
   ];
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-grid-pattern p-4">
       <Card className="w-full max-w-md text-center shadow-2xl shadow-primary/10">
         <CardHeader>
-          <Trophy className="mx-auto h-16 w-16 text-amber-400" />
+          <Trophy className="mx-auto h-16 w-16 text-accent" />
           <CardTitle className="text-3xl font-bold tracking-tighter">
             {winnings > 0 ? "Congratulations!" : "Good Game!"}
           </CardTitle>

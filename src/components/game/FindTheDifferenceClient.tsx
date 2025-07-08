@@ -79,7 +79,7 @@ export function FindTheDifferenceClient() {
                 <span>Time: {timeLeft}s</span>
             </div>
             <div className="flex items-center gap-2 text-lg font-semibold">
-                <CheckCircle2 className="h-6 w-6 text-green-500"/>
+                <CheckCircle2 className="h-6 w-6 text-positive"/>
                 <span>Found: {foundCount} / {differences.length}</span>
             </div>
         </CardContent>
@@ -101,7 +101,7 @@ export function FindTheDifferenceClient() {
                 >
                     {diff.found && (
                         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                            <Circle className="w-full h-full text-green-400/80 stroke-[4px]" />
+                            <Circle className="w-full h-full text-positive/80 stroke-[4px]" />
                         </motion.div>
                     )}
                 </div>
@@ -120,9 +120,9 @@ export function FindTheDifferenceClient() {
             style={{ left: feedback.x - 24, top: feedback.y - 24, zIndex: 100 }}
           >
             {feedback.type === 'correct' ? (
-                <CheckCircle2 className="h-12 w-12 text-green-500" fill="white" />
+                <CheckCircle2 className="h-12 w-12 text-positive" fill="white" />
             ) : (
-                <XCircle className="h-12 w-12 text-red-500" fill="white" />
+                <XCircle className="h-12 w-12 text-destructive" fill="white" />
             )}
           </motion.div>
         )}

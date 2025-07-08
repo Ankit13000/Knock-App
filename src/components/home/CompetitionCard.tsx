@@ -12,9 +12,9 @@ type CompetitionCardProps = {
 };
 
 const statusColors = {
-  Live: 'bg-green-500/20 text-green-400 border-green-500/30',
-  Upcoming: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  Results: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+  Live: 'bg-positive/20 text-positive border-positive/30',
+  Upcoming: 'bg-primary/20 text-primary border-primary/30',
+  Results: 'bg-muted text-muted-foreground border-border',
 };
 
 export function CompetitionCard({ competition }: CompetitionCardProps) {
@@ -39,7 +39,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         <h3 className="text-lg font-bold tracking-tight">{competition.title}</h3>
         <div className="mt-2 flex items-center justify-between text-muted-foreground">
           <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-amber-400" />
+            <Trophy className="h-4 w-4 text-accent" />
             <span className="font-semibold text-foreground">₹{competition.prize}</span>
           </div>
           <div className="flex items-center gap-2">

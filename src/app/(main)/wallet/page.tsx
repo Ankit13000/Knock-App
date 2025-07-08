@@ -70,7 +70,7 @@ export default function WalletPage() {
                                     <TableCell>
                                         <div className="flex items-center gap-2">
                                             <span className={cn('flex h-8 w-8 items-center justify-center rounded-full bg-secondary',
-                                                (tx.type === 'Deposit' || tx.type === 'Winnings') ? 'text-green-500' : 'text-red-500'
+                                                (tx.type === 'Deposit' || tx.type === 'Winnings') ? 'text-positive' : 'text-destructive'
                                             )}>
                                                 {(tx.type === 'Deposit' || tx.type === 'Winnings') ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownLeft className="h-4 w-4" />}
                                             </span>
@@ -80,14 +80,14 @@ export default function WalletPage() {
                                     <TableCell className="text-muted-foreground">{tx.date}</TableCell>
                                     <TableCell>
                                         <span className={cn('px-2 py-1 rounded-full text-xs font-medium', 
-                                            tx.status === 'Completed' ? 'bg-green-500/20 text-green-400' : 
-                                            tx.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-400' : 
-                                            'bg-red-500/20 text-red-400'
+                                            tx.status === 'Completed' ? 'bg-positive/20 text-positive' : 
+                                            tx.status === 'Pending' ? 'bg-accent/20 text-accent' : 
+                                            'bg-destructive/20 text-destructive'
                                         )}>
                                             {tx.status}
                                         </span>
                                     </TableCell>
-                                    <TableCell className={cn('text-right font-mono font-semibold', (tx.amount > 0) ? 'text-green-400' : 'text-foreground')}>
+                                    <TableCell className={cn('text-right font-mono font-semibold', (tx.amount > 0) ? 'text-positive' : 'text-foreground')}>
                                         {tx.amount > 0 ? `+₹${tx.amount}` : `-₹${Math.abs(tx.amount)}`}
                                     </TableCell>
                                 </TableRow>
