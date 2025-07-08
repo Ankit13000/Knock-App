@@ -9,22 +9,19 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getInitials } from "@/lib/utils";
-import { MoreHorizontal, Edit, Trash2, PlusCircle, DollarSign } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, PlusCircle } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { UserForm } from "@/components/admin/UserForm";
 import type { User, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AddFundsForm } from "@/components/admin/AddFundsForm";
 
 export default function UsersPage() {
   const { users, addUser, updateUser, deleteUser, addTransaction } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [userForFunds, setUserForFunds] = useState<User | null>(null);
-  const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredUsers = useMemo(() => {
@@ -63,11 +60,6 @@ export default function UsersPage() {
     setSelectedUser(null);
   };
 
-  const handleOpenAddFunds = (user: User) => {
-    setUserForFunds(user);
-    setIsAddFundsOpen(true);
-  };
-
   const handleAddFunds = (userId: string, amount: number) => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
@@ -86,8 +78,7 @@ export default function UsersPage() {
     addTransaction(newTransaction);
 
     toast({ title: 'Funds Added', description: `₹${amount.toLocaleString()} added to ${user.name}'s wallet.` });
-    setIsAddFundsOpen(false);
-    setUserForFunds(null);
+    // Keep form open for further edits
   };
 
   return (
@@ -158,11 +149,7 @@ export default function UsersPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(user)}>
                               <Edit className="mr-2 h-4 w-4" />
-                              <span>Edit</span>
-                            </DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => handleOpenAddFunds(user)}>
-                              <DollarSign className="mr-2 h-4 w-4" />
-                              <span>Add Funds</span>
+                              <span>Edit / Add Funds</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                              <AlertDialog>
@@ -202,13 +189,8 @@ export default function UsersPage() {
         isOpen={isFormOpen}
         onOpenChange={setIsFormOpen}
         onSave={handleSave}
+        onAddFunds={handleAddFunds}
         user={selectedUser}
-      />
-      <AddFundsForm
-        isOpen={isAddFundsOpen}
-        onOpenChange={setIsAddFundsOpen}
-        onSave={handleAddFunds}
-        user={userForFunds}
       />
     </>
   );

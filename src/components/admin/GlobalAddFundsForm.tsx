@@ -8,42 +8,42 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { User } from '@/lib/types';
 import { DollarSign } from 'lucide-react';
 
 const addFundsSchema = z.object({
+  userId: z.string().min(1, 'Please select a user.'),
   amount: z.coerce.number().positive('Amount must be positive.'),
 });
 
 type AddFundsFormValues = z.infer<typeof addFundsSchema>;
 
-interface AddFundsFormProps {
+interface GlobalAddFundsFormProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSave: (userId: string, amount: number) => void;
-  user: User | null;
+  onSave: (data: { userId: string; amount: number }) => void;
+  users: User[];
 }
 
-export function AddFundsForm({ isOpen, onOpenChange, onSave, user }: AddFundsFormProps) {
+export function GlobalAddFundsForm({ isOpen, onOpenChange, onSave, users }: GlobalAddFundsFormProps) {
   const form = useForm<AddFundsFormValues>({
     resolver: zodResolver(addFundsSchema),
     defaultValues: {
+      userId: '',
       amount: 0,
     },
   });
 
   useEffect(() => {
     if (!isOpen) {
-      form.reset({ amount: 0 });
+      form.reset({ userId: '', amount: 0 });
     }
   }, [isOpen, form]);
 
   const onSubmit = (data: AddFundsFormValues) => {
-    if (!user) return;
-    onSave(user.id, data.amount);
+    onSave(data);
   };
-
-  if (!user) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -54,11 +54,33 @@ export function AddFundsForm({ isOpen, onOpenChange, onSave, user }: AddFundsFor
             Add Funds to Wallet
           </DialogTitle>
           <DialogDescription>
-            Manually add funds to {user.name}'s wallet. This will create a 'Deposit' transaction record.
+            Select a user and enter an amount to add to their wallet.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <FormField
+              control={form.control}
+              name="userId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>User</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a user" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>{user.name} ({user.email})</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="amount"
