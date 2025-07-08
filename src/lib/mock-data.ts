@@ -2,7 +2,7 @@ import type { Competition, Transaction, User, LeaderboardEntry } from './types';
 
 export const mockUser: User = {
   name: 'Alex Ray',
-  avatar: 'https://placehold.co/100x100.png',
+  avatar: null,
   walletBalance: 1250.75,
   wins: 12,
   totalGames: 48,
