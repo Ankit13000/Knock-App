@@ -59,7 +59,7 @@ export default function UsersPage() {
       updateUser(userData);
       toast({ title: "Success", description: "User information updated." });
     } else { // Otherwise, it's a create.
-      addUser(userData);
+      addUser({ ...userData, isBanned: false });
       toast({ title: "Success", description: "User created successfully." });
     }
     setIsFormOpen(false);

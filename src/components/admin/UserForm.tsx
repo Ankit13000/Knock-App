@@ -44,7 +44,7 @@ export function UserForm({ isOpen, onOpenChange, onSave, onAddFunds, user }: Use
     if (isOpen) {
       if (isCreateMode) {
         form.reset({ name: '', email: '' });
-      } else {
+      } else if (user) {
         form.reset({
           name: user.name,
           email: user.email,
@@ -74,11 +74,12 @@ export function UserForm({ isOpen, onOpenChange, onSave, onAddFunds, user }: Use
         wins: 0,
         totalGames: 0,
         totalEarned: 0,
+        isBanned: false,
       };
       onSave(newUser);
-    } else {
+    } else if (user) {
       const updatedUser: User = {
-        ...user!,
+        ...user,
         name: data.name,
         email: data.email,
       };
@@ -100,11 +101,11 @@ export function UserForm({ isOpen, onOpenChange, onSave, onAddFunds, user }: Use
         <div className="max-h-[70vh] overflow-y-auto pr-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} id="user-details-form" className="space-y-4 py-4">
-              {!isCreateMode && (
+              {!isCreateMode && user && (
                 <FormItem>
                   <FormLabel>User ID</FormLabel>
                   <FormControl>
-                    <Input readOnly disabled value={user!.id} />
+                    <Input readOnly disabled value={user.id} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

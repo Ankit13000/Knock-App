@@ -38,7 +38,7 @@ export type User = {
   wins: number;
   totalGames: number;
   totalEarned: number;
-  isBanned?: boolean;
+  isBanned: boolean;
   banReason?: string;
   banExpiresAt?: string | null;
 };

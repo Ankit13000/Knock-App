@@ -104,10 +104,12 @@ export default function UserDetailsPage() {
                             This user's account is suspended.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="text-sm">
-                        <p><strong>Reason:</strong> {user.banReason}</p>
-                        <p><strong>Ban Expires:</strong> {user.banExpiresAt ? new Date(user.banExpiresAt).toLocaleDateString() : 'N/A'}</p>
-                    </CardContent>
+                    {user.banReason && (
+                         <CardContent className="text-sm">
+                            <p><strong>Reason:</strong> {user.banReason}</p>
+                            <p><strong>Ban Expires:</strong> {user.banExpiresAt ? new Date(user.banExpiresAt).toLocaleDateString() : 'N/A'}</p>
+                        </CardContent>
+                    )}
                 </Card>
             )}
 
