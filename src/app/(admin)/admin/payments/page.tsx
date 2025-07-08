@@ -5,17 +5,13 @@ import { useApp } from '@/context/AppContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { ArrowDownLeft, ArrowUpRight, DollarSign, FilterX } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, FilterX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { Transaction, User } from '@/lib/types';
-import { GlobalAddFundsForm } from '@/components/admin/GlobalAddFundsForm';
-import { useToast } from '@/hooks/use-toast';
+import type { Transaction } from '@/lib/types';
 
 export default function PaymentsPage() {
-  const { users, transactions, updateTransaction, updateUser, addTransaction } = useApp();
-  const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);
+  const { users, transactions, updateTransaction } = useApp();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const filteredTransactions = useMemo(() => {
     if (!selectedUserId) return transactions;
@@ -32,28 +28,6 @@ export default function PaymentsPage() {
     updateTransaction({ ...tx, status });
   };
   
-  const handleAddFunds = ({ userId, amount }: { userId: string, amount: number }) => {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
-
-    updateUser({ ...user, walletBalance: user.walletBalance + amount });
-
-    const newTransaction: Transaction = {
-      id: `txn_${new Date().getTime()}`,
-      userId: user.id,
-      userName: user.name,
-      type: 'Deposit',
-      amount: amount,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Completed',
-    };
-    addTransaction(newTransaction);
-
-    toast({ title: 'Funds Added', description: `₹${amount.toLocaleString()} added to ${user.name}'s wallet.` });
-    setIsAddFundsOpen(false);
-  };
-
-
   return (
     <>
       <div className="space-y-8">
@@ -62,10 +36,6 @@ export default function PaymentsPage() {
             <h1 className="text-3xl font-bold tracking-tighter">Payment Management</h1>
             <p className="text-muted-foreground">View and monitor all app transactions.</p>
           </div>
-          <Button onClick={() => setIsAddFundsOpen(true)}>
-            <DollarSign className="mr-2 h-4 w-4" />
-            Add Funds
-          </Button>
         </div>
 
         <Card>
@@ -152,12 +122,6 @@ export default function PaymentsPage() {
           </CardContent>
         </Card>
       </div>
-      <GlobalAddFundsForm 
-        isOpen={isAddFundsOpen}
-        onOpenChange={setIsAddFundsOpen}
-        onSave={handleAddFunds}
-        users={users}
-      />
     </>
   );
 }
