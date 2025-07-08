@@ -9,8 +9,14 @@ import { Users, Trophy, DollarSign, Activity } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 
 export default function AdminDashboardPage() {
-  const { competitions } = useApp();
+  const { competitions, users } = useApp();
   const recentCompetitions = competitions.slice(0, 5);
+
+  const totalRevenue = competitions.reduce((acc, comp) => acc + (comp.entryFee * comp.participants), 0);
+  const activeUsers = users.length;
+  const totalCompetitions = competitions.length;
+  const liveCompetitions = competitions.filter(c => c.status === 'Live').length;
+  const totalGamesPlayed = users.reduce((acc, user) => acc + user.totalGames, 0);
 
   return (
     <div className="space-y-8">
@@ -20,10 +26,10 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Revenue" value="₹1,25,430" icon={DollarSign} change="+5.2% this month" />
-        <StatCard title="Active Users" value="1,245" icon={Users} change="+120 this month" />
-        <StatCard title="Competitions" value="58" icon={Trophy} change="+3 live now" />
-        <StatCard title="User Activity" value="2,304" icon={Activity} change="-2.1% today" />
+        <StatCard title="Total Revenue" value={`₹${totalRevenue.toLocaleString()}`} icon={DollarSign} change="From all entry fees" />
+        <StatCard title="Active Users" value={activeUsers.toLocaleString()} icon={Users} change="+2 this month" />
+        <StatCard title="Competitions" value={totalCompetitions.toLocaleString()} icon={Trophy} change={`${liveCompetitions} live now`} />
+        <StatCard title="Total Games Played" value={totalGamesPlayed.toLocaleString()} icon={Activity} change="+50 today" />
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">

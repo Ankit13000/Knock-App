@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Zap, Trophy, Users } from 'lucide-react';
+import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/competitions', icon: Trophy, label: 'Competitions' },
   { href: '/admin/users', icon: Users, label: 'Users' },
+  { href: '/admin/stats', icon: BarChartHorizontal, label: 'Statistics' },
 ];
 
 export function AdminSidebar() {
@@ -27,7 +28,7 @@ export function AdminSidebar() {
         <nav className="flex flex-1 flex-col">
           <ul role="list" className="flex flex-1 flex-col gap-y-2">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname.startsWith(item.href);
               return (
                 <li key={item.label}>
                   <Link
