@@ -8,48 +8,48 @@ body {
 
 @layer base {
   :root {
-    --background: 274 65% 10%; /* #170A29 */
-    --foreground: 0 0% 98%;
-    --card: 274 60% 15%;
-    --card-foreground: 0 0% 98%;
-    --popover: 274 65% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 273 67% 45%; /* #7026C3 */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 274 60% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 274 60% 20%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 192 67% 45%; /* #26A6C3 */
-    --accent-foreground: 0 0% 98%;
+    --background: 20 80% 8%;
+    --foreground: 20 15% 95%;
+    --card: 20 80% 12%;
+    --card-foreground: 20 15% 95%;
+    --popover: 20 80% 8%;
+    --popover-foreground: 20 15% 95%;
+    --primary: 30 90% 55%;
+    --primary-foreground: 30 90% 10%;
+    --secondary: 20 80% 16%;
+    --secondary-foreground: 20 15% 95%;
+    --muted: 20 80% 16%;
+    --muted-foreground: 20 15% 65%;
+    --accent: 50 95% 55%;
+    --accent-foreground: 50 95% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 274 60% 25%;
-    --input: 274 60% 25%;
-    --ring: 192 67% 45%;
+    --border: 20 80% 20%;
+    --input: 20 80% 20%;
+    --ring: 30 90% 55%;
     --radius: 0.8rem;
   }
  
   .dark {
-    --background: 274 65% 10%;
-    --foreground: 0 0% 98%;
-    --card: 274 60% 15%;
-    --card-foreground: 0 0% 98%;
-    --popover: 274 65% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 273 67% 45%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 274 60% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 274 60% 20%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 192 67% 45%;
-    --accent-foreground: 0 0% 98%;
+    --background: 20 80% 8%;
+    --foreground: 20 15% 95%;
+    --card: 20 80% 12%;
+    --card-foreground: 20 15% 95%;
+    --popover: 20 80% 8%;
+    --popover-foreground: 20 15% 95%;
+    --primary: 30 90% 55%;
+    --primary-foreground: 30 90% 10%;
+    --secondary: 20 80% 16%;
+    --secondary-foreground: 20 15% 95%;
+    --muted: 20 80% 16%;
+    --muted-foreground: 20 15% 65%;
+    --accent: 50 95% 55%;
+    --accent-foreground: 50 95% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 274 60% 25%;
-    --input: 274 60% 25%;
-    --ring: 192 67% 45%;
+    --border: 20 80% 20%;
+    --input: 20 80% 20%;
+    --ring: 30 90% 55%;
   }
 }
 
@@ -64,6 +64,6 @@ body {
 
 @layer components {
   .btn-gradient {
-    @apply bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity;
+    @apply bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transition-opacity;
   }
 }
