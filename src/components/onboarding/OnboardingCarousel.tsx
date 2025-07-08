@@ -54,7 +54,7 @@ export function OnboardingCarousel() {
                   <p className="mt-2 text-muted-foreground">{step.description}</p>
                   
                   {index === onboardingSteps.length - 1 && (
-                     <Link href="/login" className="w-full">
+                     <Link href="/signup" className="w-full">
                         <Button size="lg" className="mt-8 w-full btn-gradient">
                             Get Started
                         </Button>

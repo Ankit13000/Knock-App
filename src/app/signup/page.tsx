@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -16,20 +17,24 @@ const GoogleIcon = () => (
 );
 
 
-export default function LoginPage() {
+export default function SignUpPage() {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-grid-pattern p-4">
       <Card className="w-full max-w-md shadow-2xl shadow-primary/10">
         <CardHeader className="text-center">
           <Zap className="mx-auto h-12 w-12 text-primary" />
-          <CardTitle className="text-3xl font-bold tracking-tighter">Welcome Back!</CardTitle>
-          <CardDescription>Log in to continue the fun.</CardDescription>
+          <CardTitle className="text-3xl font-bold tracking-tighter">Get Started with Knock</CardTitle>
+          <CardDescription>Create an account to join the competition.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="email">Email or Mobile Number</Label>
                 <Input id="email" type="email" placeholder="you@example.com" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="coupon">Coupon Code (Optional)</Label>
+              <Input id="coupon" placeholder="Have a referral code?" />
             </div>
             <Link href="/home" className="w-full">
                 <Button className="w-full btn-gradient">
@@ -44,15 +49,21 @@ export default function LoginPage() {
           </div>
           <Button variant="outline" className="w-full">
             <GoogleIcon />
-            <span className="ml-2">Sign in with Google</span>
+            <span className="ml-2">Sign up with Google</span>
           </Button>
 
           <div className="space-y-2 text-center">
+            <div className="flex items-center space-x-2 justify-center">
+                <Checkbox id="terms" required />
+                <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground"
+                >
+                    I agree to the <Link href="#" className="underline text-primary">Terms & Conditions</Link>
+                </label>
+            </div>
              <p className="text-sm text-muted-foreground">
-                Don't have an account? <Link href="/signup" className="underline text-primary">Sign Up</Link>
-            </p>
-             <p className="text-sm text-muted-foreground">
-                <Link href="/home" className="underline">Continue as Guest</Link>
+                Already have an account? <Link href="/login" className="underline text-primary">Log In</Link>
             </p>
           </div>
         </CardContent>
