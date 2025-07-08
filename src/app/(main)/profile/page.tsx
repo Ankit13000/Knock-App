@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { mockUser } from '@/lib/mock-data';
-import { Edit, Gamepad2, LogOut, ShieldCheck, Trophy, Wallet } from 'lucide-react';
+import { Camera, Edit, Gamepad2, LogOut, ShieldCheck, Trash2, Trophy, Wallet } from 'lucide-react';
 import React from 'react';
 
 const stats = [
@@ -30,7 +30,9 @@ const profileFormSchema = z.object({
 export default function ProfilePage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [userName, setUserName] = useState(mockUser.name);
+  const [avatar, setAvatar] = useState<string | null>(mockUser.avatar);
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
@@ -39,7 +41,7 @@ export default function ProfilePage() {
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     form.reset({ name: userName });
   }, [userName, form]);
 
@@ -52,6 +54,30 @@ export default function ProfilePage() {
     setIsEditDialogOpen(false);
   }
 
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result as string);
+        toast({
+          title: "Profile Picture Updated",
+          description: "Your new picture has been saved.",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleRemoveAvatar = () => {
+    setAvatar(null);
+    toast({
+      title: "Profile Picture Removed",
+      description: "Your default avatar will be shown.",
+    });
+  }
+
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
        <div>
@@ -62,7 +88,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader className="text-center">
             <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary">
-                <AvatarImage src={mockUser.avatar} alt={userName} />
+                <AvatarImage src={avatar || undefined} alt={userName} />
                 <AvatarFallback className="text-3xl">{userName.charAt(0)}</AvatarFallback>
             </Avatar>
             <CardTitle className="text-2xl">{userName}</CardTitle>
@@ -98,27 +124,51 @@ export default function ProfilePage() {
                       Make changes to your profile here. Click save when you're done.
                     </DialogDescription>
                   </DialogHeader>
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Your name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-                        <Button type="submit">Save changes</Button>
-                      </DialogFooter>
-                    </form>
-                  </Form>
+                  <div className="py-4 space-y-4">
+                     <div className="flex items-center gap-4">
+                        <Avatar className="w-16 h-16">
+                            <AvatarImage src={avatar || undefined} alt={userName} />
+                            <AvatarFallback className="text-2xl">{userName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col gap-2">
+                           <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                             <Camera className="mr-2 h-4 w-4" /> Change Picture
+                           </Button>
+                           <Button variant="ghost" size="sm" onClick={handleRemoveAvatar} disabled={!avatar}>
+                             <Trash2 className="mr-2 h-4 w-4" /> Remove
+                           </Button>
+                           <input 
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleAvatarChange}
+                              className="hidden"
+                              accept="image/png, image/jpeg"
+                            />
+                        </div>
+                    </div>
+                    <Separator />
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Your name" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <DialogFooter>
+                          <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+                          <Button type="submit">Save changes</Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </div>
                 </DialogContent>
               </Dialog>
 
