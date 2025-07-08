@@ -10,6 +10,7 @@ export const mockUser: User = {
   wins: 12,
   totalGames: 48,
   totalEarned: 5500,
+  isBanned: false,
 };
 
 export const mockAdminUsers: User[] = [
@@ -24,6 +25,7 @@ export const mockAdminUsers: User[] = [
     wins: 5,
     totalGames: 20,
     totalEarned: 1200,
+    isBanned: false,
   },
   {
     id: 'usr_3',
@@ -35,6 +37,9 @@ export const mockAdminUsers: User[] = [
     wins: 1,
     totalGames: 10,
     totalEarned: 150,
+    isBanned: true,
+    banReason: 'Suspicious activity detected on account.',
+    banExpiresAt: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString().split('T')[0], // Banned for 5 more days
   },
   {
     id: 'usr_4',
@@ -46,6 +51,7 @@ export const mockAdminUsers: User[] = [
     wins: 150,
     totalGames: 200,
     totalEarned: 50000,
+    isBanned: false,
   },
 ];
 
