@@ -1,13 +1,16 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/admin/StatCard";
 import { RecentUsersChart } from "@/components/admin/RecentUsersChart";
 import { Users, Trophy, DollarSign, Activity } from "lucide-react";
-import { mockCompetitions } from "@/lib/mock-data";
+import { useApp } from "@/context/AppContext";
 
 export default function AdminDashboardPage() {
-  const recentCompetitions = mockCompetitions.slice(0, 5);
+  const { competitions } = useApp();
+  const recentCompetitions = competitions.slice(0, 5);
 
   return (
     <div className="space-y-8">

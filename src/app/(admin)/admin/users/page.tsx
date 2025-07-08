@@ -1,15 +1,17 @@
+'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { mockAdminUsers } from "@/lib/mock-data";
 import { getInitials } from "@/lib/utils";
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { useApp } from "@/context/AppContext";
 
 export default function UsersPage() {
+  const { users } = useApp();
+
   return (
     <div className="space-y-8">
       <div>
@@ -35,7 +37,7 @@ export default function UsersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockAdminUsers.map((user) => (
+              {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">

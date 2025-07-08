@@ -2,11 +2,9 @@ import type { ReactNode } from 'react';
 import { DesktopSidebar } from '@/components/layout/DesktopSidebar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { AppHeader } from '@/components/layout/AppHeader';
-import { Providers } from './providers';
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
-    <Providers>
       <div className="flex min-h-screen w-full bg-background">
         <DesktopSidebar />
         <div className="flex w-full flex-1 flex-col md:pl-64">
@@ -19,6 +17,5 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </div>
         <BottomNav />
       </div>
-    </Providers>
   );
 }

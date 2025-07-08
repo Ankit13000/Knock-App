@@ -1,12 +1,28 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { mockCompetitions } from '@/lib/mock-data';
 import { AlertCircle, ChevronLeft, Ticket, Trophy, Users, Clock } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
 export default function CompetitionDetailPage({ params }: { params: { id: string } }) {
-  const competition = mockCompetitions.find(c => c.id === params.id) || mockCompetitions[0];
+  const { competitions } = useApp();
+  const competition = competitions.find(c => c.id === params.id);
+
+  if (!competition) {
+    return (
+       <div className="container mx-auto max-w-4xl py-8 text-center">
+        <h1 className="text-2xl font-bold">Competition not found</h1>
+        <p className="text-muted-foreground">The competition may have been removed or the link is invalid.</p>
+        <Button asChild className="mt-4">
+          <Link href="/home">Return to competitions</Link>
+        </Button>
+      </div>
+    )
+  }
+
   const progress = (competition.participants / competition.totalSpots) * 100;
 
   const details = [
@@ -54,7 +70,7 @@ export default function CompetitionDetailPage({ params }: { params: { id: string
             <p className="text-center text-sm text-muted-foreground mt-2">{competition.totalSpots - competition.participants} spots left!</p>
           </div>
           
-          <Link href={`/game/${competition.gameType.toLowerCase().replace(/ /g, '-')}`} className="w-full">
+          <Link href={`/game/find-the-difference?id=${competition.id}`} className="w-full">
             <Button size="lg" className="w-full btn-gradient text-lg h-12">
                 Join Now
             </Button>

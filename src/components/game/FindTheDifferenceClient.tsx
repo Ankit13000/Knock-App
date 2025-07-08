@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Circle, Clock, Target, XCircle } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Loader2, Target, XCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
-import { mockCompetitions } from '@/lib/mock-data';
+import { useApp } from '@/context/AppContext';
 
 const GAME_DURATION = 60; // seconds
 
@@ -28,9 +27,15 @@ const initialDifferences: Difference[] = [
   { id: 5, top: '55%', left: '30%', size: '8%', found: false },
 ];
 
-export function FindTheDifferenceClient() {
+export function FindTheDifferenceClient({ competitionId }: { competitionId?: string }) {
   const router = useRouter();
-  const competition = mockCompetitions[0];
+  const { competitions } = useApp();
+  
+  const competition = useMemo(() => 
+    competitionId ? competitions.find(c => c.id === competitionId) : undefined,
+    [competitions, competitionId]
+  );
+
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [differences, setDifferences] = useState<Difference[]>(initialDifferences);
   const [score, setScore] = useState(0);
@@ -39,7 +44,14 @@ export function FindTheDifferenceClient() {
   const foundCount = differences.filter(d => d.find).length;
 
   useEffect(() => {
-    if (timeLeft <= 0 || foundCount === differences.length) {
+    if (!competitionId) {
+       router.push('/home');
+    }
+  }, [competitionId, router]);
+
+
+  useEffect(() => {
+    if (timeLeft <= 0 || (competition && foundCount === differences.length)) {
       setTimeout(() => router.push('/results'), 1000);
       return;
     }
@@ -49,15 +61,17 @@ export function FindTheDifferenceClient() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, foundCount, router]);
+  }, [timeLeft, foundCount, router, competition]);
 
   const handleFeedbackEnd = () => setFeedback(null);
 
   const handleFound = (id: number, e: React.MouseEvent) => {
-    const newDifferences = differences.map(d => (d.id === id ? { ...d, found: true } : d));
-    setDifferences(newDifferences);
-    setScore(prev => prev + 100 + timeLeft); // Bonus points for speed
-    setFeedback({ type: 'correct', x: e.clientX, y: e.clientY });
+    if (!differences.find(d => d.id === id)?.found) {
+      const newDifferences = differences.map(d => (d.id === id ? { ...d, found: true } : d));
+      setDifferences(newDifferences);
+      setScore(prev => prev + 100 + timeLeft); // Bonus points for speed
+      setFeedback({ type: 'correct', x: e.clientX, y: e.clientY });
+    }
   };
   
   const handleWrongClick = (e: React.MouseEvent) => {
@@ -65,6 +79,15 @@ export function FindTheDifferenceClient() {
     setScore(prev => Math.max(0, prev - 20));
     setFeedback({ type: 'wrong', x: e.clientX, y: e.clientY });
   };
+  
+  if (!competition) {
+    return (
+       <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="text-muted-foreground">Loading Game...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full w-full items-center p-4 space-y-4">
@@ -97,7 +120,7 @@ export function FindTheDifferenceClient() {
                      data-ishotspot="true"
                      className="absolute rounded-full"
                      style={{ top: diff.top, left: diff.left, width: diff.size, height: diff.size, transform: 'translate(-50%, -50%)' }}
-                     onClick={(e) => { e.stopPropagation(); if (!diff.found) handleFound(diff.id, e); }}
+                     onClick={(e) => { e.stopPropagation(); handleFound(diff.id, e); }}
                 >
                     {diff.found && (
                         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>

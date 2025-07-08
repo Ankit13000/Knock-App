@@ -1,13 +1,19 @@
+'use client';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { mockCompetitions, mockUser } from '@/lib/mock-data';
 import { CompetitionCard } from '@/components/home/CompetitionCard';
 import { SmartSuggestion } from '@/components/home/SmartSuggestion';
+import { useApp } from '@/context/AppContext';
+import { useUser } from '@/context/UserContext';
 
 export default function HomePage() {
+  const { competitions } = useApp();
+  const { user } = useUser();
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tighter">Welcome back, {mockUser.name.split(' ')[0]}!</h1>
+        <h1 className="text-3xl font-bold tracking-tighter">Welcome back, {user.name.split(' ')[0]}!</h1>
         <p className="text-muted-foreground">Ready to win big today?</p>
       </div>
 
@@ -32,7 +38,7 @@ export default function HomePage() {
         <div className="sm:col-span-2 lg:col-span-1 xl:col-span-1">
           <SmartSuggestion />
         </div>
-        {mockCompetitions.map((competition) => (
+        {competitions.map((competition) => (
           <CompetitionCard key={competition.id} competition={competition} />
         ))}
       </div>

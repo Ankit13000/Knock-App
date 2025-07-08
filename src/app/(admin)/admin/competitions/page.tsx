@@ -8,13 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { MoreHorizontal, PlusCircle, Trash2, Edit } from 'lucide-react';
-import { mockCompetitions } from '@/lib/mock-data';
 import type { Competition } from '@/lib/types';
 import { CompetitionForm } from '@/components/admin/CompetitionForm';
 import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/context/AppContext';
 
 export default function CompetitionsPage() {
-  const [competitions, setCompetitions] = useState<Competition[]>(mockCompetitions);
+  const { competitions, addCompetition, updateCompetition, deleteCompetition } = useApp();
   const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
@@ -30,18 +30,18 @@ export default function CompetitionsPage() {
   };
 
   const handleDelete = (id: string) => {
-    setCompetitions(competitions.filter(c => c.id !== id));
+    deleteCompetition(id);
     toast({ title: "Success", description: "Competition deleted." });
   };
 
   const handleSave = (competitionData: Competition) => {
     if (selectedCompetition) {
       // Edit
-      setCompetitions(competitions.map(c => c.id === competitionData.id ? competitionData : c));
+      updateCompetition(competitionData);
       toast({ title: "Success", description: "Competition updated." });
     } else {
       // Create
-      setCompetitions([competitionData, ...competitions]);
+      addCompetition({ ...competitionData, id: new Date().toISOString() });
       toast({ title: "Success", description: "Competition created." });
     }
     setIsFormOpen(false);
