@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/context/UserContext';
 import { Camera, Edit, Gamepad2, LogOut, ShieldCheck, Trash2, Trophy, Wallet } from 'lucide-react';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -22,6 +23,7 @@ const profileFormSchema = z.object({
 
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { user, setUser } = useUser();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -75,6 +77,10 @@ export default function ProfilePage() {
       description: "Your default avatar will be shown.",
     });
   }
+
+  const handleLogout = () => {
+    router.push('/login');
+  };
 
 
   return (
@@ -171,7 +177,7 @@ export default function ProfilePage() {
                 </DialogContent>
               </Dialog>
 
-              <Button variant="destructive" className="w-full">
+              <Button variant="destructive" className="w-full" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" /> Logout
               </Button>
             </div>
