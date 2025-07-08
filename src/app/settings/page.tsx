@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, FileText, LifeBuoy, MessageSquareWarning, ShieldQuestion } from 'lucide-react';
 
 const settingsItems = [
-  { icon: FileText, label: 'Game Rules', href: '#' },
-  { icon: ShieldQuestion, label: 'Terms & Conditions', href: '#' },
-  { icon: LifeBuoy, label: 'Contact Support', href: '#' },
-  { icon: MessageSquareWarning, label: 'Report a Bug', href: '#' },
+  { icon: FileText, label: 'Game Rules', href: '/settings/game-rules' },
+  { icon: ShieldQuestion, label: 'Terms & Conditions', href: '/settings/terms' },
+  { icon: LifeBuoy, label: 'Contact Support', href: '/settings/support' },
+  { icon: MessageSquareWarning, label: 'Report a Bug', href: '/settings/report-bug' },
 ];
 
 export default function SettingsPage() {
