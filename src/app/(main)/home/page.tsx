@@ -7,7 +7,7 @@ import { useApp } from '@/context/AppContext';
 import { useUser } from '@/context/UserContext';
 
 export default function HomePage() {
-  const { competitions } = useApp();
+  const { competitions, gameTypes } = useApp();
   const { user } = useUser();
 
   return (
@@ -26,9 +26,9 @@ export default function HomePage() {
             </SelectTrigger>
             <SelectContent>
                 <SelectItem value="all">All Games</SelectItem>
-                <SelectItem value="find-the-difference">Find the Difference</SelectItem>
-                <SelectItem value="quiz">Quiz</SelectItem>
-                <SelectItem value="puzzle">Puzzle</SelectItem>
+                {gameTypes.map(gt => (
+                  <SelectItem key={gt.id} value={gt.name.toLowerCase().replace(/ /g, "-")}>{gt.name}</SelectItem>
+                ))}
             </SelectContent>
             </Select>
         </div>

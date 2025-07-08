@@ -1,7 +1,12 @@
+export type GameType = {
+  id: string;
+  name: string;
+};
+
 export type Competition = {
   id: string;
   title: string;
-  gameType: 'Find the Difference' | 'Quiz' | 'Puzzle';
+  gameType: string;
   entryFee: number;
   prize: number;
   timeLeft: string;

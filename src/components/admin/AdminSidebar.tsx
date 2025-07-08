@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard, Gamepad2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/competitions', icon: Trophy, label: 'Competitions' },
+  { href: '/admin/game-types', icon: Gamepad2, label: 'Game Types' },
   { href: '/admin/users', icon: Users, label: 'Users' },
   { href: '/admin/stats', icon: BarChartHorizontal, label: 'Statistics' },
   { href: '/admin/payments', icon: CreditCard, label: 'Payments' },

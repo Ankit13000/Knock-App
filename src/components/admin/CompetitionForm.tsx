@@ -10,10 +10,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Competition } from '@/lib/types';
+import { useApp } from '@/context/AppContext';
 
 const competitionSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters.'),
-  gameType: z.enum(['Find the Difference', 'Quiz', 'Puzzle']),
+  gameType: z.string().min(1, 'A game type is required.'),
   entryFee: z.coerce.number().min(0, 'Entry fee cannot be negative.'),
   prize: z.coerce.number().min(0, 'Prize cannot be negative.'),
   totalSpots: z.coerce.number().int().min(2, 'Must have at least 2 spots.'),
@@ -33,11 +34,12 @@ interface CompetitionFormProps {
 }
 
 export function CompetitionForm({ isOpen, onOpenChange, onSave, competition }: CompetitionFormProps) {
+  const { gameTypes } = useApp();
   const form = useForm<CompetitionFormValues>({
     resolver: zodResolver(competitionSchema),
     defaultValues: {
       title: '',
-      gameType: 'Find the Difference',
+      gameType: '',
       entryFee: 0,
       prize: 0,
       totalSpots: 10,
@@ -54,7 +56,7 @@ export function CompetitionForm({ isOpen, onOpenChange, onSave, competition }: C
     } else {
       form.reset({
         title: '',
-        gameType: 'Find the Difference',
+        gameType: '',
         entryFee: 0,
         prize: 0,
         totalSpots: 10,
@@ -108,16 +110,16 @@ export function CompetitionForm({ isOpen, onOpenChange, onSave, competition }: C
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Game Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a game type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Find the Difference">Find the Difference</SelectItem>
-                        <SelectItem value="Quiz">Quiz</SelectItem>
-                        <SelectItem value="Puzzle">Puzzle</SelectItem>
+                        {gameTypes.map((gt) => (
+                           <SelectItem key={gt.id} value={gt.name}>{gt.name}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

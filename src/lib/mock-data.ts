@@ -1,4 +1,4 @@
-import type { Competition, Transaction, User, LeaderboardEntry } from './types';
+import type { Competition, Transaction, User, LeaderboardEntry, GameType } from './types';
 
 export const mockUser: User = {
   id: 'usr_1',
@@ -49,6 +49,11 @@ export const mockAdminUsers: User[] = [
   },
 ];
 
+export const mockGameTypes: GameType[] = [
+  { id: 'gt_1', name: 'Find the Difference' },
+  { id: 'gt_2', name: 'Quiz' },
+  { id: 'gt_3', name: 'Puzzle' },
+];
 
 export const mockCompetitions: Competition[] = [
   {

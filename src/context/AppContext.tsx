@@ -1,8 +1,8 @@
 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';
-import type { Competition, User, Transaction } from '@/lib/types';
-import { mockCompetitions, mockAdminUsers, mockTransactions } from '@/lib/mock-data';
+import type { Competition, User, Transaction, GameType } from '@/lib/types';
+import { mockCompetitions, mockAdminUsers, mockTransactions, mockGameTypes } from '@/lib/mock-data';
 
 interface AppContextType {
   competitions: Competition[];
@@ -13,6 +13,10 @@ interface AppContextType {
   transactions: Transaction[];
   addTransaction: (transaction: Transaction) => void;
   updateTransaction: (transaction: Transaction) => void;
+  gameTypes: GameType[];
+  addGameType: (gameType: GameType) => void;
+  updateGameType: (gameType: GameType) => void;
+  deleteGameType: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -21,6 +25,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [competitions, setCompetitions] = useState<Competition[]>(mockCompetitions);
   const [users, setUsers] = useState<User[]>(mockAdminUsers);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [gameTypes, setGameTypes] = useState<GameType[]>(mockGameTypes);
 
   const addCompetition = (competition: Competition) => {
     setCompetitions(prev => [competition, ...prev]);
@@ -42,6 +47,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTransactions(prev => prev.map(t => t.id === transactionToUpdate.id ? transactionToUpdate : t));
   };
 
+  const addGameType = (gameType: GameType) => {
+    setGameTypes(prev => [gameType, ...prev]);
+  };
+
+  const updateGameType = (gameTypeToUpdate: GameType) => {
+    setGameTypes(prev => prev.map(gt => gt.id === gameTypeToUpdate.id ? gameTypeToUpdate : gt));
+  };
+
+  const deleteGameType = (id: string) => {
+    setGameTypes(prev => prev.filter(gt => gt.id !== id));
+  };
+
   const value = {
     competitions,
     addCompetition,
@@ -51,6 +68,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     transactions,
     addTransaction,
     updateTransaction,
+    gameTypes,
+    addGameType,
+    updateGameType,
+    deleteGameType,
   };
 
   return (
