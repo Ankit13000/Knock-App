@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Zap } from 'lucide-react';
+import { LayoutDashboard, Zap, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/admin/competitions', icon: Trophy, label: 'Competitions' },
 ];
 
 export function AdminSidebar() {
