@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Settings, Trophy, User, Wallet, Zap } from 'lucide-react';
+import { Home, Settings, Trophy, User, Wallet, Zap, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
@@ -10,6 +10,7 @@ const mainNavItems = [
   { href: '/home', icon: Home, label: 'Home' },
   { href: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
   { href: '/wallet', icon: Wallet, label: 'Wallet' },
+  { href: '/referrals', icon: Gift, label: 'Referrals' },
   { href: '/profile', icon: User, label: 'Profile' },
 ];
 

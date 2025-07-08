@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Wallet, User } from 'lucide-react';
+import { Home, Trophy, Wallet, User, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/home', icon: Home, label: 'Home' },
   { href: '/leaderboard', icon: Trophy, label: 'Leaders' },
+  { href: '/referrals', icon: Gift, label: 'Refer' },
   { href: '/wallet', icon: Wallet, label: 'Wallet' },
   { href: '/profile', icon: User, label: 'Profile' },
 ];
@@ -17,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/80 p-2 backdrop-blur-sm md:hidden">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-1">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
           return (
@@ -29,7 +30,7 @@ export function BottomNav() {
                 isActive && 'bg-primary/10 text-primary'
               )}
             >
-              <item.icon className="h-6 w-6" />
+              <item.icon className="h-5 w-5" />
               <span className="text-xs font-medium">{item.label}</span>
             </Link>
           );
