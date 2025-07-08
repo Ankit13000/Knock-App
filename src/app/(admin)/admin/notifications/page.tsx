@@ -8,15 +8,17 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Send, Trophy, Award } from 'lucide-react';
+import { Bell, Send, Trophy, Award, Loader2 } from 'lucide-react';
+import { sendNotification } from '@/ai/flows/send-notification-flow';
 
 export default function NotificationsPage() {
   const { toast } = useToast();
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [type, setType] = useState('announcement');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendNotification = () => {
+  const handleSendNotification = async () => {
     if (!title || !message) {
       toast({
         variant: 'destructive',
@@ -26,19 +28,32 @@ export default function NotificationsPage() {
       return;
     }
 
-    // In a real app, this would trigger a backend service (e.g., Firebase Cloud Functions)
-    // to send push notifications or emails to users.
-    console.log('Sending notification:', { type, title, message });
+    setIsLoading(true);
 
-    toast({
-      title: 'Notification Sent!',
-      description: `Your "${title}" message has been broadcasted.`,
-    });
-
-    // Reset form
-    setTitle('');
-    setMessage('');
-    setType('announcement');
+    try {
+      const result = await sendNotification({ title, message });
+      if (result.success) {
+        toast({
+          title: 'Notification Sent!',
+          description: result.message,
+        });
+        // Reset form
+        setTitle('');
+        setMessage('');
+        setType('announcement');
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error('Failed to send notification:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Sending Failed',
+        description: error instanceof Error ? error.message : 'An unknown error occurred.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -56,7 +71,7 @@ export default function NotificationsPage() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="notification-type">Notification Type</Label>
-            <Select value={type} onValueChange={setType}>
+            <Select value={type} onValueChange={setType} disabled={isLoading}>
               <SelectTrigger id="notification-type">
                 <SelectValue placeholder="Select a type" />
               </SelectTrigger>
@@ -87,6 +102,7 @@ export default function NotificationsPage() {
               placeholder="e.g., New Tournament Live!"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
@@ -98,12 +114,17 @@ export default function NotificationsPage() {
               rows={5}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              disabled={isLoading}
             />
           </div>
           
-          <Button onClick={handleSendNotification} className="w-full">
-            <Send className="mr-2 h-4 w-4" />
-            Send Notification to All Users
+          <Button onClick={handleSendNotification} className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
+            {isLoading ? 'Sending...' : 'Send Notification to All Users'}
           </Button>
         </CardContent>
       </Card>
