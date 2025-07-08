@@ -1,15 +1,63 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockTransactions, mockUser } from '@/lib/mock-data';
+import { mockTransactions } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { ArrowDownLeft, ArrowUpRight, Plus, Wallet } from 'lucide-react';
+import { useUser } from '@/context/UserContext';
+import { useToast } from '@/hooks/use-toast';
+import type { Transaction } from '@/lib/types';
 
 const quickAddAmounts = [100, 250, 500];
 
 export default function WalletPage() {
+  const { user, setUser } = useUser();
+  const { toast } = useToast();
+  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [customAmount, setCustomAmount] = useState('');
+
+  const handleAddMoney = (amount: number) => {
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Amount',
+        description: 'Please enter a valid positive number.',
+      });
+      return;
+    }
+
+    setUser(prevUser => ({
+      ...prevUser,
+      walletBalance: prevUser.walletBalance + amount,
+    }));
+
+    const newTransaction: Transaction = {
+      id: Date.now().toString(),
+      type: 'Deposit',
+      amount: amount,
+      date: new Date().toISOString().split('T')[0],
+      status: 'Completed',
+    };
+
+    setTransactions(prevTx => [newTransaction, ...prevTx]);
+    
+    setCustomAmount('');
+
+    toast({
+      title: 'Success!',
+      description: `₹${amount.toLocaleString()} has been added to your wallet.`,
+    });
+  };
+
+  const handleCustomAmountSubmit = () => {
+    const amount = parseFloat(customAmount);
+    handleAddMoney(amount);
+  }
+
   return (
     <div className="space-y-8">
       <div>
@@ -22,7 +70,7 @@ export default function WalletPage() {
             <Card className="text-center">
                 <CardHeader>
                     <Wallet className="w-12 h-12 mx-auto text-primary" />
-                    <CardTitle className="text-4xl font-bold tracking-tighter">₹{mockUser.walletBalance.toLocaleString()}</CardTitle>
+                    <CardTitle className="text-4xl font-bold tracking-tighter">₹{user.walletBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</CardTitle>
                     <CardDescription>Current Balance</CardDescription>
                 </CardHeader>
             </Card>
@@ -35,12 +83,23 @@ export default function WalletPage() {
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-2">
                         {quickAddAmounts.map(amount => (
-                            <Button key={amount} variant="outline">₹{amount}</Button>
+                            <Button key={amount} variant="outline" onClick={() => handleAddMoney(amount)}>₹{amount}</Button>
                         ))}
                     </div>
                     <div className="flex items-center gap-2">
-                        <Input type="number" placeholder="Custom Amount" />
-                        <Button className="btn-gradient">
+                        <Input 
+                          type="number" 
+                          placeholder="Custom Amount"
+                          value={customAmount}
+                          onChange={(e) => setCustomAmount(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleCustomAmountSubmit();
+                            }
+                          }}
+                        />
+                        <Button className="btn-gradient" onClick={handleCustomAmountSubmit}>
                             <Plus className="h-4 w-4 mr-2" /> Add
                         </Button>
                     </div>
@@ -65,7 +124,7 @@ export default function WalletPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {mockTransactions.map(tx => (
+                            {transactions.map(tx => (
                                 <TableRow key={tx.id}>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
@@ -88,7 +147,7 @@ export default function WalletPage() {
                                         </span>
                                     </TableCell>
                                     <TableCell className={cn('text-right font-mono font-semibold', (tx.amount > 0) ? 'text-positive' : 'text-foreground')}>
-                                        {tx.amount > 0 ? `+₹${tx.amount}` : `-₹${Math.abs(tx.amount)}`}
+                                        {tx.amount > 0 ? `+₹${tx.amount.toLocaleString()}` : `-₹${Math.abs(tx.amount).toLocaleString()}`}
                                     </TableCell>
                                 </TableRow>
                             ))}
