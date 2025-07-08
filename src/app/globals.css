@@ -8,48 +8,48 @@ body {
 
 @layer base {
   :root {
-    --background: 54 95% 85%; /* #FFF1AD - Vivid Yellow */
-    --foreground: 240 60% 13%; /* #212121 - Charcoal Black */
-    --card: 0 0% 100%; /* #FFFFFF - White */
-    --card-foreground: 240 60% 13%;
+    --background: 48 100% 97%; /* #fffcee - Soft Cream */
+    --foreground: 240 10% 4%;   /* #09090b - Near Black */
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 60% 13%;
-    --primary: 261 51% 50%; /* #673AB7 - Deep Purple */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 16% 91%;
-    --secondary-foreground: 0 0% 13%;
-    --muted: 240 5% 48%; /* #757575 - Cool Grey */
-    --muted-foreground: 240 5% 65%;
-    --accent: 231 52% 54%; /* #3F51B5 - Indigo Blue */
-    --accent-foreground: 0 0% 100%;
-    --destructive: 1 72% 56%; /* #E53935 - Soft Red */
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 16% 91%;
-    --input: 220 16% 91%;
-    --ring: 261 51% 50%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 51 98% 51%;      /* #fdd835 - Vibrant Yellow */
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 5% 96%;      /* #f4f4f5 - Light Grey */
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 38 92% 50%;       /* #f59e0b - Rich Gold */
+    --accent-foreground: 240 10% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 51 98% 51%;
     --radius: 0.8rem;
   }
  
   .dark {
-    --background: 54 95% 85%; /* #FFF1AD - Vivid Yellow */
-    --foreground: 240 60% 13%; /* #212121 - Charcoal Black */
-    --card: 0 0% 100%; /* #FFFFFF - White */
-    --card-foreground: 240 60% 13%;
+    --background: 48 100% 97%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 60% 13%;
-    --primary: 261 51% 50%; /* #673AB7 - Deep Purple */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 16% 91%;
-    --secondary-foreground: 0 0% 13%;
-    --muted: 240 5% 48%; /* #757575 - Cool Grey */
-    --muted-foreground: 240 5% 65%;
-    --accent: 231 52% 54%; /* #3F51B5 - Indigo Blue */
-    --accent-foreground: 0 0% 100%;
-    --destructive: 1 72% 56%; /* #E53935 - Soft Red */
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 16% 91%;
-    --input: 220 16% 91%;
-    --ring: 261 51% 50%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 51 98% 51%;
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 240 10% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 51 98% 51%;
   }
 }
 
@@ -64,6 +64,6 @@ body {
 
 @layer components {
   .btn-gradient {
-    @apply bg-gradient-to-r from-primary to-accent text-accent-foreground hover:opacity-90 transition-opacity;
+    @apply bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity;
   }
 }
