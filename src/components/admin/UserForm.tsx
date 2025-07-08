@@ -64,6 +64,15 @@ export function UserForm({ isOpen, onOpenChange, onSave, user }: UserFormProps) 
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            {user && (
+              <FormItem>
+                <FormLabel>User ID</FormLabel>
+                <FormControl>
+                  <Input readOnly disabled value={user.id} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
             <FormField
               control={form.control}
               name="name"
