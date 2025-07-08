@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, FileText, LifeBuoy, MessageSquareWarning, ShieldQuestion } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileText, LifeBuoy, MessageSquareWarning, Receipt, Shield, ShieldQuestion } from 'lucide-react';
 
 const settingsItems = [
   { icon: FileText, label: 'Game Rules', href: '/settings/game-rules' },
   { icon: ShieldQuestion, label: 'Terms & Conditions', href: '/settings/terms' },
+  { icon: Shield, label: 'Privacy Policy', href: '/settings/privacy' },
+  { icon: Receipt, label: 'Refund Policy', href: '/settings/refund' },
   { icon: LifeBuoy, label: 'Contact Support', href: '/settings/support' },
   { icon: MessageSquareWarning, label: 'Report a Bug', href: '/settings/report-bug' },
 ];
