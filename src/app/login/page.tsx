@@ -32,6 +32,10 @@ export default function LoginPage() {
                 <Label htmlFor="email">Email or Mobile Number</Label>
                 <Input id="email" type="email" placeholder="you@example.com" required />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="coupon">Coupon Code (Optional)</Label>
+              <Input id="coupon" placeholder="Have a referral code?" />
+            </div>
             <Link href="/home" className="w-full">
                 <Button className="w-full btn-gradient">
                     <Mail className="mr-2 h-4 w-4" /> Continue with Email
