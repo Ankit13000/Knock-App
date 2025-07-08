@@ -10,6 +10,8 @@ interface AppContextType {
   updateCompetition: (competition: Competition) => void;
   deleteCompetition: (id: string) => void;
   users: User[];
+  updateUser: (user: User) => void;
+  deleteUser: (id: string) => void;
   transactions: Transaction[];
   addTransaction: (transaction: Transaction) => void;
   updateTransaction: (transaction: Transaction) => void;
@@ -39,6 +41,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setCompetitions(prev => prev.filter(c => c.id !== id));
   };
 
+  const updateUser = (userToUpdate: User) => {
+    setUsers(prev => prev.map(u => u.id === userToUpdate.id ? userToUpdate : u));
+  };
+
+  const deleteUser = (id: string) => {
+    setUsers(prev => prev.filter(u => u.id !== id));
+  };
+
   const addTransaction = (transaction: Transaction) => {
     setTransactions(prev => [transaction, ...prev]);
   };
@@ -65,6 +75,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateCompetition,
     deleteCompetition,
     users,
+    updateUser,
+    deleteUser,
     transactions,
     addTransaction,
     updateTransaction,

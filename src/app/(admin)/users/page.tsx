@@ -1,0 +1,157 @@
+'use client';
+
+import { useMemo, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getInitials } from "@/lib/utils";
+import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { useApp } from "@/context/AppContext";
+import { UserForm } from "@/components/admin/UserForm";
+import type { User } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export default function UsersPage() {
+  const { users, updateUser, deleteUser } = useApp();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const { toast } = useToast();
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return users;
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return users.filter(user =>
+      user.name.toLowerCase().includes(lowerCaseQuery) ||
+      user.email.toLowerCase().includes(lowerCaseQuery)
+    );
+  }, [users, searchQuery]);
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteUser(id);
+    toast({ title: "Success", description: "User has been deleted." });
+  };
+
+  const handleSave = (userData: User) => {
+    updateUser(userData);
+    toast({ title: "Success", description: "User information updated." });
+    setIsFormOpen(false);
+    setSelectedUser(null);
+  };
+
+  return (
+    <>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tighter">User Management</h1>
+          <p className="text-muted-foreground">View and manage all registered users.</p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>All Users</CardTitle>
+            <CardDescription>A list of all users in the app.</CardDescription>
+            <div className="pt-4">
+              <Input
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Join Date</TableHead>
+                  <TableHead>Games Played</TableHead>
+                  <TableHead className="text-right">Total Earned</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                          <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">{user.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.joinDate}</TableCell>
+                    <TableCell>{user.totalGames}</TableCell>
+                    <TableCell className="text-right font-mono">₹{user.totalEarned.toLocaleString()}</TableCell>
+                    <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(user)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              <span>Edit</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                             <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                                  <span className="text-destructive">Delete</span>
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete the user's account.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(user.id)} className={cn(buttonVariants({ variant: "destructive" }))}>
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+
+      <UserForm
+        isOpen={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        onSave={handleSave}
+        user={selectedUser}
+      />
+    </>
+  );
+}
