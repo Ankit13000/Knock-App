@@ -7,7 +7,7 @@ const settingsItems = [
   { icon: FileText, label: 'Game Rules', href: '/settings/game-rules' },
   { icon: ShieldQuestion, label: 'Terms & Conditions', href: '/settings/terms' },
   { icon: Shield, label: 'Privacy Policy', href: '/settings/privacy' },
-  { icon: Receipt, label: 'Refund Policy', href: '/settings/refund' },
+  { icon: Receipt, label: 'Payment Policy', href: '/settings/refund' },
   { icon: LifeBuoy, label: 'Contact Support', href: '/settings/support' },
   { icon: MessageSquareWarning, label: 'Report a Bug', href: '/settings/report-bug' },
 ];
