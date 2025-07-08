@@ -15,6 +15,8 @@ export type Competition = {
 
 export type Transaction = {
   id: string;
+  userId: string;
+  userName: string;
   type: 'Deposit' | 'Withdrawal' | 'Entry Fee' | 'Winnings';
   amount: number;
   date: string;

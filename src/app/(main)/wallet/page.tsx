@@ -5,21 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockTransactions } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { ArrowDownLeft, ArrowUpRight, Minus, Plus, Wallet } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import type { Transaction } from '@/lib/types';
+import { useApp } from '@/context/AppContext';
 
 const quickAddAmounts = [100, 250, 500];
 
 export default function WalletPage() {
   const { user, setUser } = useUser();
   const { toast } = useToast();
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const { transactions, addTransaction } = useApp();
   const [customAmount, setCustomAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
+
+  const userTransactions = transactions.filter(tx => tx.userId === user.id);
 
   const handleAddMoney = (amount: number) => {
     if (isNaN(amount) || amount <= 0) {
@@ -38,13 +40,15 @@ export default function WalletPage() {
 
     const newTransaction: Transaction = {
       id: Date.now().toString(),
+      userId: user.id,
+      userName: user.name,
       type: 'Deposit',
       amount: amount,
       date: new Date().toISOString().split('T')[0],
       status: 'Completed',
     };
 
-    setTransactions(prevTx => [newTransaction, ...prevTx]);
+    addTransaction(newTransaction);
     
     setCustomAmount('');
 
@@ -85,13 +89,15 @@ export default function WalletPage() {
 
     const newTransaction: Transaction = {
       id: Date.now().toString(),
+      userId: user.id,
+      userName: user.name,
       type: 'Withdrawal',
       amount: -amount,
       date: new Date().toISOString().split('T')[0],
       status: 'Pending',
     };
 
-    setTransactions(prevTx => [newTransaction, ...prevTx]);
+    addTransaction(newTransaction);
     setWithdrawAmount('');
 
     toast({
@@ -198,7 +204,7 @@ export default function WalletPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {transactions.map(tx => (
+                            {userTransactions.map(tx => (
                                 <TableRow key={tx.id}>
                                     <TableCell>
                                         <div className="flex items-center gap-2">

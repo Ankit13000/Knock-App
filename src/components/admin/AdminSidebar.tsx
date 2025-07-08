@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal } from 'lucide-react';
+import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { href: '/admin/competitions', icon: Trophy, label: 'Competitions' },
   { href: '/admin/users', icon: Users, label: 'Users' },
   { href: '/admin/stats', icon: BarChartHorizontal, label: 'Statistics' },
+  { href: '/admin/payments', icon: CreditCard, label: 'Payments' },
 ];
 
 export function AdminSidebar() {

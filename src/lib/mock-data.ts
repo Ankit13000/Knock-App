@@ -110,11 +110,12 @@ export const mockCompetitions: Competition[] = [
 ];
 
 export const mockTransactions: Transaction[] = [
-  { id: '1', type: 'Deposit', amount: 500, date: '2024-07-28', status: 'Completed' },
-  { id: '2', type: 'Entry Fee', amount: -50, date: '2024-07-28', status: 'Completed' },
-  { id: '3', type: 'Winnings', amount: 500, date: '2024-07-27', status: 'Completed' },
-  { id: '4', type: 'Withdrawal', amount: -1000, date: '2024-07-26', status: 'Pending' },
-  { id: '5', type: 'Entry Fee', amount: -100, date: '2024-07-25', status: 'Completed' },
+  { id: '1', userId: 'usr_1', userName: 'Alex Ray', type: 'Deposit', amount: 500, date: '2024-07-28', status: 'Completed' },
+  { id: '2', userId: 'usr_1', userName: 'Alex Ray', type: 'Entry Fee', amount: -50, date: '2024-07-28', status: 'Completed' },
+  { id: '3', userId: 'usr_1', userName: 'Alex Ray', type: 'Winnings', amount: 500, date: '2024-07-27', status: 'Completed' },
+  { id: '4', userId: 'usr_2', userName: 'Bethany Frank', type: 'Withdrawal', amount: -1000, date: '2024-07-26', status: 'Pending' },
+  { id: '5', userId: 'usr_3', userName: 'Charlie Day', type: 'Entry Fee', amount: -100, date: '2024-07-25', status: 'Completed' },
+  { id: '6', userId: 'usr_4', userName: 'Diana Prince', type: 'Deposit', amount: 1000, date: '2024-07-24', status: 'Completed' },
 ];
 
 export const mockLeaderboard: LeaderboardEntry[] = [
