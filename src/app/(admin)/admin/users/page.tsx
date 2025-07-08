@@ -125,13 +125,16 @@ export default function UsersPage() {
                 {filteredUsers.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleEdit(user)}
+                        className="flex items-center gap-3 text-left group"
+                      >
                         <Avatar>
                           <AvatarImage src={user.avatar || undefined} alt={user.name} />
                           <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
-                        <span className="font-medium">{user.name}</span>
-                      </div>
+                        <span className="font-medium group-hover:underline">{user.name}</span>
+                      </button>
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.joinDate}</TableCell>
