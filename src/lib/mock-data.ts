@@ -1,0 +1,87 @@
+import type { Competition, Transaction, User, LeaderboardEntry } from './types';
+
+export const mockUser: User = {
+  name: 'Alex Ray',
+  avatar: 'https://placehold.co/100x100.png',
+  walletBalance: 1250.75,
+  wins: 12,
+  totalGames: 48,
+  totalEarned: 5500,
+};
+
+export const mockCompetitions: Competition[] = [
+  {
+    id: '1',
+    title: 'Jungle Jam',
+    gameType: 'Find the Difference',
+    entryFee: 50,
+    prize: 500,
+    timeLeft: '1h 15m',
+    status: 'Live',
+    participants: 8,
+    totalSpots: 10,
+    image: 'https://placehold.co/600x400.png',
+    imageHint: 'jungle animals',
+    startTime: 'Live Now'
+  },
+  {
+    id: '2',
+    title: 'Cityscapes',
+    gameType: 'Find the Difference',
+    entryFee: 100,
+    prize: 1000,
+    timeLeft: 'Starts in 3h',
+    status: 'Upcoming',
+    participants: 2,
+    totalSpots: 10,
+    image: 'https://placehold.co/600x400.png',
+    imageHint: 'city skyline',
+    startTime: 'Today at 8:00 PM'
+  },
+  {
+    id: '3',
+    title: 'Ocean Oddities',
+    gameType: 'Find the Difference',
+    entryFee: 25,
+    prize: 200,
+    timeLeft: 'Ended',
+    status: 'Results',
+    participants: 10,
+    totalSpots: 10,
+    image: 'https://placehold.co/600x400.png',
+    imageHint: 'ocean life',
+    startTime: 'Yesterday at 5:00 PM'
+  },
+    {
+    id: '4',
+    title: 'Desert Dreams',
+    gameType: 'Find the Difference',
+    entryFee: 75,
+    prize: 750,
+    timeLeft: 'Starts in 1d',
+    status: 'Upcoming',
+    participants: 0,
+    totalSpots: 10,
+    image: 'https://placehold.co/600x400.png',
+    imageHint: 'desert landscape',
+    startTime: 'Tomorrow at 3:00 PM'
+  },
+];
+
+export const mockTransactions: Transaction[] = [
+  { id: '1', type: 'Deposit', amount: 500, date: '2024-07-28', status: 'Completed' },
+  { id: '2', type: 'Entry Fee', amount: -50, date: '2024-07-28', status: 'Completed' },
+  { id: '3', type: 'Winnings', amount: 500, date: '2024-07-27', status: 'Completed' },
+  { id: '4', type: 'Withdrawal', amount: -1000, date: '2024-07-26', status: 'Pending' },
+  { id: '5', type: 'Entry Fee', amount: -100, date: '2024-07-25', status: 'Completed' },
+];
+
+export const mockLeaderboard: LeaderboardEntry[] = [
+    { rank: 1, name: 'CyberNinja', score: 15200, prize: 5000, avatar: 'https://placehold.co/40x40.png' },
+    { rank: 2, name: 'PixelProwler', score: 14950, prize: 2500, avatar: 'https://placehold.co/40x40.png' },
+    { rank: 3, name: 'QuantumQueen', score: 14800, prize: 1000, avatar: 'https://placehold.co/40x40.png' },
+    { rank: 4, name: mockUser.name, score: 14500, prize: 500, avatar: mockUser.avatar },
+    { rank: 5, name: 'VortexViper', score: 14200, prize: 250, avatar: 'https://placehold.co/40x40.png' },
+    { rank: 6, name: 'DreamWeaver', score: 13900, prize: 100, avatar: 'https://placehold.co/40x40.png' },
+    { rank: 7, name: 'GhostGlider', score: 13500, prize: 50, avatar: 'https://placehold.co/40x40.png' },
+];
