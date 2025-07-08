@@ -25,6 +25,8 @@ interface UserFormProps {
 }
 
 export function UserForm({ isOpen, onOpenChange, onSave, user }: UserFormProps) {
+  const isCreateMode = user === null;
+
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -34,41 +36,60 @@ export function UserForm({ isOpen, onOpenChange, onSave, user }: UserFormProps) 
   });
 
   useEffect(() => {
-    if (user) {
-      form.reset({
-        name: user.name,
-        email: user.email,
-      });
+    if (isOpen) {
+      if (isCreateMode) {
+        form.reset({ name: '', email: '' });
+      } else {
+        form.reset({
+          name: user.name,
+          email: user.email,
+        });
+      }
     }
-  }, [user, form, isOpen]);
+  }, [user, form, isOpen, isCreateMode]);
 
   const onSubmit = (data: UserFormValues) => {
-    if (!user) return; 
-
-    const userData: User = {
-      ...user,
-      name: data.name,
-      email: data.email,
-    };
-    onSave(userData);
+    if (isCreateMode) {
+      const newUser: User = {
+        id: `usr_${new Date().getTime()}`,
+        name: data.name,
+        email: data.email,
+        joinDate: new Date().toISOString().split('T')[0],
+        avatar: null,
+        walletBalance: 0,
+        wins: 0,
+        totalGames: 0,
+        totalEarned: 0,
+      };
+      onSave(newUser);
+    } else {
+      const updatedUser: User = {
+        ...user!,
+        name: data.name,
+        email: data.email,
+      };
+      onSave(updatedUser);
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit User</DialogTitle>
+          <DialogTitle>{isCreateMode ? 'Create New User' : 'Edit User'}</DialogTitle>
           <DialogDescription>
-            Update the user's details. Click save when you're done.
+            {isCreateMode
+              ? "Fill in the details for the new user."
+              : "Update the user's details. Click save when you're done."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-            {user && (
+            {!isCreateMode && (
               <FormItem>
                 <FormLabel>User ID</FormLabel>
                 <FormControl>
-                  <Input readOnly disabled value={user.id} />
+                  <Input readOnly disabled value={user!.id} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -101,7 +122,7 @@ export function UserForm({ isOpen, onOpenChange, onSave, user }: UserFormProps) 
             />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">{isCreateMode ? 'Create User' : 'Save Changes'}</Button>
             </DialogFooter>
           </form>
         </Form>

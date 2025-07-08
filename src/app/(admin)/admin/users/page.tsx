@@ -9,19 +9,22 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getInitials } from "@/lib/utils";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, PlusCircle, DollarSign } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { UserForm } from "@/components/admin/UserForm";
-import type { User } from "@/lib/types";
+import type { User, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AddFundsForm } from "@/components/admin/AddFundsForm";
 
 export default function UsersPage() {
-  const { users, updateUser, deleteUser } = useApp();
+  const { users, addUser, updateUser, deleteUser, addTransaction } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [userForFunds, setUserForFunds] = useState<User | null>(null);
+  const [isAddFundsOpen, setIsAddFundsOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredUsers = useMemo(() => {
@@ -32,6 +35,11 @@ export default function UsersPage() {
       user.email.toLowerCase().includes(lowerCaseQuery)
     );
   }, [users, searchQuery]);
+
+  const handleCreate = () => {
+    setSelectedUser(null);
+    setIsFormOpen(true);
+  };
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -44,18 +52,56 @@ export default function UsersPage() {
   };
 
   const handleSave = (userData: User) => {
-    updateUser(userData);
-    toast({ title: "Success", description: "User information updated." });
+    if (selectedUser) { // If there was a selected user, it's an edit.
+      updateUser(userData);
+      toast({ title: "Success", description: "User information updated." });
+    } else { // Otherwise, it's a create.
+      addUser(userData);
+      toast({ title: "Success", description: "User created successfully." });
+    }
     setIsFormOpen(false);
     setSelectedUser(null);
+  };
+
+  const handleOpenAddFunds = (user: User) => {
+    setUserForFunds(user);
+    setIsAddFundsOpen(true);
+  };
+
+  const handleAddFunds = (userId: string, amount: number) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    updateUser({ ...user, walletBalance: user.walletBalance + amount });
+
+    const newTransaction: Transaction = {
+      id: `txn_${new Date().getTime()}`,
+      userId: user.id,
+      userName: user.name,
+      type: 'Deposit',
+      amount: amount,
+      date: new Date().toISOString().split('T')[0],
+      status: 'Completed',
+    };
+    addTransaction(newTransaction);
+
+    toast({ title: 'Funds Added', description: `₹${amount.toLocaleString()} added to ${user.name}'s wallet.` });
+    setIsAddFundsOpen(false);
+    setUserForFunds(null);
   };
 
   return (
     <>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tighter">User Management</h1>
-          <p className="text-muted-foreground">View and manage all registered users.</p>
+        <div className="flex items-center justify-between">
+           <div>
+            <h1 className="text-3xl font-bold tracking-tighter">User Management</h1>
+            <p className="text-muted-foreground">View and manage all registered users.</p>
+          </div>
+           <Button onClick={handleCreate}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create User
+          </Button>
         </div>
 
         <Card>
@@ -79,6 +125,7 @@ export default function UsersPage() {
                   <TableHead>Email</TableHead>
                   <TableHead>Join Date</TableHead>
                   <TableHead>Games Played</TableHead>
+                  <TableHead>Wallet</TableHead>
                   <TableHead className="text-right">Total Earned</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -98,6 +145,7 @@ export default function UsersPage() {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.joinDate}</TableCell>
                     <TableCell>{user.totalGames}</TableCell>
+                    <TableCell className="font-mono">₹{user.walletBalance.toLocaleString()}</TableCell>
                     <TableCell className="text-right font-mono">₹{user.totalEarned.toLocaleString()}</TableCell>
                     <TableCell className="text-right">
                         <DropdownMenu>
@@ -111,6 +159,10 @@ export default function UsersPage() {
                             <DropdownMenuItem onClick={() => handleEdit(user)}>
                               <Edit className="mr-2 h-4 w-4" />
                               <span>Edit</span>
+                            </DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleOpenAddFunds(user)}>
+                              <DollarSign className="mr-2 h-4 w-4" />
+                              <span>Add Funds</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                              <AlertDialog>
@@ -151,6 +203,12 @@ export default function UsersPage() {
         onOpenChange={setIsFormOpen}
         onSave={handleSave}
         user={selectedUser}
+      />
+      <AddFundsForm
+        isOpen={isAddFundsOpen}
+        onOpenChange={setIsAddFundsOpen}
+        onSave={handleAddFunds}
+        user={userForFunds}
       />
     </>
   );
