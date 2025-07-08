@@ -5,9 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { Transaction } from '@/lib/types';
 
 export default function PaymentsPage() {
-  const { transactions } = useApp();
+  const { transactions, updateTransaction } = useApp();
+
+  const handleUpdateStatus = (tx: Transaction, status: 'Completed' | 'Failed') => {
+    updateTransaction({ ...tx, status });
+  };
 
   return (
     <div className="space-y-8">
@@ -30,6 +36,7 @@ export default function PaymentsPage() {
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -60,6 +67,18 @@ export default function PaymentsPage() {
                   </TableCell>
                   <TableCell className={cn('text-right font-mono font-semibold', tx.amount > 0 ? 'text-positive' : 'text-destructive')}>
                     {tx.amount > 0 ? `+₹${tx.amount.toLocaleString()}` : `-₹${Math.abs(tx.amount).toLocaleString()}`}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {tx.type === 'Withdrawal' && tx.status === 'Pending' && (
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline" className="border-positive text-positive hover:bg-positive/10 hover:text-positive" onClick={() => handleUpdateStatus(tx, 'Completed')}>
+                          Approve
+                        </Button>
+                        <Button size="sm" variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleUpdateStatus(tx, 'Failed')}>
+                          Deny
+                        </Button>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

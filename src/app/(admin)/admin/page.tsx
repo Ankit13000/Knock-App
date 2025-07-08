@@ -5,12 +5,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/admin/StatCard";
 import { RecentUsersChart } from "@/components/admin/RecentUsersChart";
-import { Users, Trophy, DollarSign, Activity } from "lucide-react";
+import { Users, Trophy, DollarSign, Activity, Crown } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import { mockLeaderboard } from "@/lib/mock-data";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/lib/utils";
 
 export default function AdminDashboardPage() {
   const { competitions, users } = useApp();
   const recentCompetitions = competitions.slice(0, 5);
+  const topLeaders = mockLeaderboard.slice(0, 5);
 
   const totalRevenue = competitions.reduce((acc, comp) => acc + (comp.entryFee * comp.participants), 0);
   const activeUsers = users.length;
@@ -32,8 +36,8 @@ export default function AdminDashboardPage() {
         <StatCard title="Total Games Played" value={totalGamesPlayed.toLocaleString()} icon={Activity} change="+50 today" />
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
+      <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
+        <Card>
           <CardHeader>
             <CardTitle>New Users Overview</CardTitle>
             <CardDescription>Monthly new user registrations.</CardDescription>
@@ -43,7 +47,35 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Leaderboard Snapshot</CardTitle>
+            <CardDescription>Top 5 players this week.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {topLeaders.map((leader, index) => (
+                <div key={leader.rank} className="flex items-center gap-4">
+                  <div className="flex-shrink-0 w-8 text-center font-bold text-lg text-muted-foreground">
+                    {index === 0 ? <Crown className="w-6 h-6 text-amber-400" /> : leader.rank}
+                  </div>
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={leader.avatar || undefined} alt={leader.name} />
+                    <AvatarFallback>{getInitials(leader.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-grow">
+                    <p className="font-semibold">{leader.name}</p>
+                    <p className="text-sm text-muted-foreground">{leader.score.toLocaleString()} Points</p>
+                  </div>
+                  <div className="font-bold text-positive">₹{leader.prize.toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Card>
           <CardHeader>
             <CardTitle>Recent Competitions</CardTitle>
             <CardDescription>A list of the most recent competitions.</CardDescription>
@@ -76,7 +108,6 @@ export default function AdminDashboardPage() {
             </Table>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

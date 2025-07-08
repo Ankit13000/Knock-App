@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { MoreHorizontal, PlusCircle, Trash2, Edit } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Trash2, Edit, Copy } from 'lucide-react';
 import type { Competition } from '@/lib/types';
 import { CompetitionForm } from '@/components/admin/CompetitionForm';
 import { useToast } from '@/hooks/use-toast';
@@ -33,6 +33,19 @@ export default function CompetitionsPage() {
     deleteCompetition(id);
     toast({ title: "Success", description: "Competition deleted." });
   };
+  
+  const handleClone = (competition: Competition) => {
+    const newCompetition = {
+      ...competition,
+      id: new Date().toISOString(),
+      title: `${competition.title} (Copy)`,
+      participants: 0,
+      status: 'Upcoming' as const,
+    };
+    addCompetition(newCompetition);
+    toast({ title: "Success", description: `Cloned "${competition.title}".` });
+  };
+
 
   const handleSave = (competitionData: Competition) => {
     if (selectedCompetition) {
@@ -107,6 +120,11 @@ export default function CompetitionsPage() {
                             <Edit className="mr-2 h-4 w-4" />
                             <span>Edit</span>
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleClone(comp)}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            <span>Clone</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

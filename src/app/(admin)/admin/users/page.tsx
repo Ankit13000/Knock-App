@@ -1,9 +1,11 @@
 'use client';
 
+import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getInitials } from "@/lib/utils";
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
@@ -11,6 +13,16 @@ import { useApp } from "@/context/AppContext";
 
 export default function UsersPage() {
   const { users } = useApp();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return users;
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return users.filter(user =>
+      user.name.toLowerCase().includes(lowerCaseQuery) ||
+      user.email.toLowerCase().includes(lowerCaseQuery)
+    );
+  }, [users, searchQuery]);
 
   return (
     <div className="space-y-8">
@@ -23,6 +35,14 @@ export default function UsersPage() {
         <CardHeader>
           <CardTitle>All Users</CardTitle>
           <CardDescription>A list of all users in the app.</CardDescription>
+          <div className="pt-4">
+            <Input
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -37,7 +57,7 @@ export default function UsersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">

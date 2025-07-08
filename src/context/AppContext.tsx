@@ -12,6 +12,7 @@ interface AppContextType {
   users: User[];
   transactions: Transaction[];
   addTransaction: (transaction: Transaction) => void;
+  updateTransaction: (transaction: Transaction) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,6 +38,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTransactions(prev => [transaction, ...prev]);
   };
 
+  const updateTransaction = (transactionToUpdate: Transaction) => {
+    setTransactions(prev => prev.map(t => t.id === transactionToUpdate.id ? transactionToUpdate : t));
+  };
+
   const value = {
     competitions,
     addCompetition,
@@ -45,6 +50,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     users,
     transactions,
     addTransaction,
+    updateTransaction,
   };
 
   return (
