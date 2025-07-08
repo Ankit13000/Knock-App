@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard, Gamepad2 } from 'lucide-react';
+import { LayoutDashboard, Zap, Trophy, Users, BarChartHorizontal, CreditCard, Gamepad2, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { href: '/admin/users', icon: Users, label: 'Users' },
   { href: '/admin/stats', icon: BarChartHorizontal, label: 'Statistics' },
   { href: '/admin/payments', icon: CreditCard, label: 'Payments' },
+  { href: '/admin/notifications', icon: Bell, label: 'Notifications' },
 ];
 
 export function AdminSidebar() {
@@ -30,7 +31,7 @@ export function AdminSidebar() {
         <nav className="flex flex-1 flex-col">
           <ul role="list" className="flex flex-1 flex-col gap-y-2">
             {navItems.map((item) => {
-              const isActive = pathname.startsWith(item.href);
+              const isActive = pathname.startsWith(item.href) && (item.href !== '/admin' || pathname === '/admin');
               return (
                 <li key={item.label}>
                   <Link
