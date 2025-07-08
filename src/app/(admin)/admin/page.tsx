@@ -30,10 +30,10 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Revenue" value={`₹${totalRevenue.toLocaleString()}`} icon={DollarSign} change="From all entry fees" />
-        <StatCard title="Active Users" value={activeUsers.toLocaleString()} icon={Users} change="+2 this month" />
-        <StatCard title="Competitions" value={totalCompetitions.toLocaleString()} icon={Trophy} change={`${liveCompetitions} live now`} />
-        <StatCard title="Total Games Played" value={totalGamesPlayed.toLocaleString()} icon={Activity} change="+50 today" />
+        <StatCard title="Total Revenue" value={`₹${totalRevenue.toLocaleString()}`} icon={DollarSign} change="From all entry fees" href="/admin/payments"/>
+        <StatCard title="Active Users" value={activeUsers.toLocaleString()} icon={Users} change="+2 this month" href="/admin/users" />
+        <StatCard title="Competitions" value={totalCompetitions.toLocaleString()} icon={Trophy} change={`${liveCompetitions} live now`} href="/admin/competitions" />
+        <StatCard title="Total Games Played" value={totalGamesPlayed.toLocaleString()} icon={Activity} change="+50 today" href="/admin/stats" />
       </div>
 
       <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
