@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockLeaderboard, mockUser } from '@/lib/mock-data';
 import { Crown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getInitials } from '@/lib/utils';
 
 export default function LeaderboardPage() {
   const renderLeaderboardTable = (data: typeof mockLeaderboard) => (
@@ -30,7 +30,7 @@ export default function LeaderboardPage() {
               <div className="flex items-center gap-3">
                 <Avatar>
                   <AvatarImage src={entry.avatar || undefined} alt={entry.name} />
-                  <AvatarFallback>{entry.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{getInitials(entry.name)}</AvatarFallback>
                 </Avatar>
                 <span className="font-medium">{entry.name}</span>
               </div>

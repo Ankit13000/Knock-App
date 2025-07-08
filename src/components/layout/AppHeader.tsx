@@ -5,6 +5,7 @@ import { PlusCircle, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUser } from '@/context/UserContext';
+import { getInitials } from '@/lib/utils';
 
 export function AppHeader() {
   const { user } = useUser();
@@ -31,7 +32,7 @@ export function AppHeader() {
         <Link href="/profile">
           <Avatar className="h-10 w-10 border-2 border-primary">
             <AvatarImage src={user.avatar || undefined} alt={user.name} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
         </Link>
       </div>

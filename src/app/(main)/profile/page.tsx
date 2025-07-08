@@ -16,6 +16,7 @@ import { useUser } from '@/context/UserContext';
 import { Camera, Edit, Gamepad2, LogOut, ShieldCheck, Trash2, Trophy, Wallet } from 'lucide-react';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { getInitials } from '@/lib/utils';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -94,7 +95,7 @@ export default function ProfilePage() {
         <CardHeader className="text-center">
             <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-primary">
                 <AvatarImage src={user.avatar || undefined} alt={user.name} />
-                <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="text-3xl">{getInitials(user.name)}</AvatarFallback>
             </Avatar>
             <CardTitle className="text-2xl">{user.name}</CardTitle>
             <CardDescription className="flex items-center justify-center gap-2">
@@ -133,7 +134,7 @@ export default function ProfilePage() {
                      <div className="flex items-center gap-4">
                         <Avatar className="w-16 h-16">
                             <AvatarImage src={user.avatar || undefined} alt={user.name} />
-                            <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+                            <AvatarFallback className="text-2xl">{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col gap-2">
                            <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
