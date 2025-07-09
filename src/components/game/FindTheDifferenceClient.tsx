@@ -9,6 +9,7 @@ import { CheckCircle, Circle, Clock, Loader2, Target, X, XCircle } from 'lucide-
 import { Progress } from '@/components/ui/progress';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const GAME_DURATION = 60; // seconds
 
@@ -41,6 +42,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   const [differences, setDifferences] = useState<Difference[]>(initialDifferences);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong'; x: number; y: number } | null>(null);
+  const [isQuitConfirmOpen, setIsQuitConfirmOpen] = useState(false);
 
   const foundCount = differences.filter(d => d.find).length;
 
@@ -51,8 +53,12 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   }, [competitionId, router]);
 
   useEffect(() => {
+    if (isQuitConfirmOpen) {
+      return; // Pause timer when dialog is open
+    }
+
     if (timeLeft <= 0 || (competition && foundCount === differences.length)) {
-      setTimeout(() => router.push('/results'), 1500);
+      setTimeout(() => router.push(`/results?score=${score}`), 1500);
       return;
     }
 
@@ -61,7 +67,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, foundCount, router, competition]);
+  }, [timeLeft, foundCount, router, competition, score, isQuitConfirmOpen]);
 
   const handleFeedbackEnd = () => setFeedback(null);
 
@@ -83,6 +89,10 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     setFeedback({ type: 'wrong', x: e.clientX, y: e.clientY });
   };
   
+  const handleQuit = () => {
+    router.push('/results?status=forfeited');
+  };
+
   if (!competition) {
     return (
        <div className="flex h-full w-full flex-col items-center justify-center space-y-4 bg-background">
@@ -103,14 +113,14 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   );
 
   return (
-    <div className="flex flex-col h-full w-full items-center bg-gray-900 text-white relative overflow-hidden">
+    <div className="flex h-full w-full flex-col items-center bg-gray-900 text-white relative overflow-hidden">
       {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/50 pointer-events-none"></div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/50"></div>
       
       {/* Top Bar */}
-      <div className="w-full p-4 z-10">
+      <div className="z-10 w-full p-4">
         <Progress value={(timeLeft / GAME_DURATION) * 100} className="h-2 [&>div]:bg-gradient-to-r [&>div]:from-accent [&>div]:to-primary" />
-        <div className="mt-4 flex flex-wrap justify-between items-center gap-4">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
                 <h1 className="text-2xl font-bold tracking-tighter">{competition.title}</h1>
                 <div className="flex items-center gap-2">
@@ -119,16 +129,34 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
                     ))}
                 </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => router.push('/home')}>
-                <X className="h-6 w-6" />
-            </Button>
+            <AlertDialog open={isQuitConfirmOpen} onOpenChange={setIsQuitConfirmOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <X className="h-6 w-6" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to quit?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    If you quit now, your progress will be lost and the game will be forfeited.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Continue Playing</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleQuit} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Quit Game
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
         </div>
       </div>
       
       {/* Game Area */}
-      <div className="flex-1 w-full p-4 flex flex-col md:flex-row gap-4">
+      <div className="flex w-full flex-1 flex-col gap-4 p-4 md:flex-row">
         {/* Image 1 (Reference) */}
-        <div className="relative w-full flex-1 min-h-0 rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
+        <div className="relative min-h-0 w-full flex-1 overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
              <Image 
                 src={competition.image} 
                 alt="Find the difference reference" 
@@ -143,7 +171,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
         </div>
         
         {/* Image 2 (Interactive) */}
-        <div className="relative w-full flex-1 min-h-0 cursor-crosshair rounded-2xl overflow-hidden shadow-2xl shadow-accent/20 ring-2 ring-accent/50" onClick={handleWrongClick}>
+        <div className="relative min-h-0 w-full flex-1 cursor-crosshair overflow-hidden rounded-2xl shadow-2xl shadow-accent/20 ring-2 ring-accent/50" onClick={handleWrongClick}>
             <Image 
                 src={competition.image} 
                 alt="Find the difference interactive" 

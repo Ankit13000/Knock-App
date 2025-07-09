@@ -1,13 +1,35 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, Repeat, Trophy, CheckCircle, Award } from 'lucide-react';
-import { mockUser } from '@/lib/mock-data';
+import { Home, Repeat, Trophy, CheckCircle, Award, XCircle, Loader2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function ResultsPage() {
-  const score = 1250;
-  const rank = 3;
-  const winnings = 250;
+
+// This is a simplified calculation. A real app might fetch this from a server.
+function calculateResults(score: number) {
+    if (score === 0) return { rank: '-', winnings: 0 };
+    if (score > 1500) return { rank: 1, winnings: 500 };
+    if (score > 1000) return { rank: 3, winnings: 250 };
+    if (score > 500) return { rank: 10, winnings: 50 };
+    return { rank: '50+', winnings: 0 };
+}
+
+
+function ResultsPageContent() {
+  const searchParams = useSearchParams();
+  const scoreParam = searchParams.get('score');
+  const statusParam = searchParams.get('status');
+
+  const isForfeited = statusParam === 'forfeited';
+  const score = isForfeited ? 0 : parseInt(scoreParam || '0', 10);
+  
+  const { rank, winnings } = calculateResults(score);
+  
+  const title = isForfeited ? "Game Forfeited" : (winnings > 0 ? "Congratulations!" : "Good Game!");
+  const description = isForfeited ? "You left the game early." : "Here's how you performed.";
 
   const stats = [
     { icon: CheckCircle, label: 'Your Score', value: score.toLocaleString(), color: 'text-accent' },
@@ -19,26 +41,34 @@ export default function ResultsPage() {
     <div className="flex min-h-screen items-center justify-center bg-grid-pattern p-4">
       <Card className="w-full max-w-md text-center shadow-2xl shadow-primary/10">
         <CardHeader>
-          <Trophy className="mx-auto h-16 w-16 text-accent" />
+          {isForfeited ? (
+            <XCircle className="mx-auto h-16 w-16 text-destructive" />
+          ) : (
+            <Trophy className="mx-auto h-16 w-16 text-accent" />
+          )}
           <CardTitle className="text-3xl font-bold tracking-tighter">
-            {winnings > 0 ? "Congratulations!" : "Good Game!"}
+            {title}
           </CardTitle>
-          <CardDescription>Here's how you performed.</CardDescription>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {stats.map(stat => (
-              <div key={stat.label} className="p-4 bg-card rounded-lg">
-                <stat.icon className={`w-8 h-8 mx-auto mb-2 ${stat.color}`} />
-                <p className="text-2xl font-bold">{stat.value}</p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-              </div>
-            ))}
-          </div>
+          {!isForfeited && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {stats.map(stat => (
+                <div key={stat.label} className="p-4 bg-card rounded-lg">
+                  <stat.icon className={`w-8 h-8 mx-auto mb-2 ${stat.color}`} />
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="p-4 bg-secondary rounded-lg">
             <h4 className="font-semibold text-foreground">Next Steps</h4>
-            <p className="text-sm text-muted-foreground">Check the full leaderboard for final standings.</p>
+            <p className="text-sm text-muted-foreground">
+                {isForfeited ? 'Why not try another game?' : 'Check the full leaderboard for final standings.'}
+            </p>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -49,7 +79,7 @@ export default function ResultsPage() {
             </Link>
             <Link href="/home" className="w-full">
                 <Button className="w-full btn-gradient">
-                    <Repeat className="mr-2 h-4 w-4" /> Play Again
+                    <Repeat className="mr-2 h-4 w-4" /> Play Another
                 </Button>
             </Link>
           </div>
@@ -57,4 +87,16 @@ export default function ResultsPage() {
       </Card>
     </div>
   );
+}
+
+export default function ResultsPage() {
+    return (
+        <Suspense fallback={
+          <div className="flex h-screen w-full items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        }>
+            <ResultsPageContent />
+        </Suspense>
+    )
 }
