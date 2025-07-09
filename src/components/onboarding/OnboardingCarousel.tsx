@@ -20,7 +20,7 @@ const onboardingSteps = [
     description: 'The ultimate platform for skill-based gaming competitions.',
   },
   {
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1570585703502-1375b93e7a97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyMHx8cGxheXxlbnwwfHx8fDE3NTIwNjE4NDN8MA&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'money games',
     title: 'Play Skill-Based Games & Win Money',
     description: 'Challenge your skills and compete for real cash prizes.',
