@@ -4,6 +4,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Autoplay from 'embla-carousel-autoplay';
+import { motion } from 'framer-motion';
 import {
   Carousel,
   CarouselContent,
@@ -53,14 +54,25 @@ export function OnboardingCarousel() {
             <div className="p-1">
               <Card className="overflow-hidden border-2 border-primary/20 shadow-xl shadow-primary/10">
                 <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-                  <Image
-                    src={step.image}
-                    alt={step.title}
-                    width={400}
-                    height={300}
-                    className="mb-6 aspect-video w-full rounded-lg object-cover"
-                    data-ai-hint={step.imageHint}
-                  />
+                   <div className="relative w-full mb-6 rounded-lg overflow-hidden">
+                    <Image
+                      src={step.image}
+                      alt={step.title}
+                      width={400}
+                      height={300}
+                      className="aspect-video w-full object-cover"
+                      data-ai-hint={step.imageHint}
+                    />
+                    <div className="absolute bottom-0 left-0 h-1 w-full bg-background/30">
+                       <motion.div
+                        key={index} // Re-triggers animation on each slide
+                        className="h-full bg-gradient-to-r from-primary to-accent"
+                        initial={{ width: '0%' }}
+                        animate={{ width: '100%' }}
+                        transition={{ duration: 3, ease: 'linear' }}
+                      />
+                    </div>
+                  </div>
                   <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
                   <p className="mt-2 text-muted-foreground">{step.description}</p>
                   
