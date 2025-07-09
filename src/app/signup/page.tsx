@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap, UserPlus, Mail, Loader2 } from 'lucide-react';
+import { Zap, UserPlus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -30,14 +30,20 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToPaymentPolicy, setAgreedToPaymentPolicy] = useState(false);
-  
-  // New state for OTP flow
-  const [isOtpSent, setIsOtpSent] = useState(false);
-  const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendOtp = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!agreedToTerms || !agreedToPaymentPolicy) {
+       toast({
+        variant: 'destructive',
+        title: 'Agreement Required',
+        description: 'You must agree to all policies to continue.',
+      });
+      return;
+    }
+
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(mobileNumber)) {
       toast({
@@ -47,50 +53,26 @@ export default function SignUpPage() {
       });
       return;
     }
-
+    
     setIsLoading(true);
     // Simulate API call to send OTP
     await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
     
     toast({
       title: 'OTP Sent!',
-      description: `A 6-digit code has been sent to ${mobileNumber}. (Hint: it's 123456)`,
+      description: `A 6-digit code has been sent to ${mobileNumber}.`,
     });
+
+    // Store user data to be used on OTP page.
+    // In a real app, you might get a session token from the backend to reference this data.
+    try {
+        const signupData = { name, password };
+        localStorage.setItem('signupData', JSON.stringify(signupData));
+    } catch (error) {
+        console.error("Could not save signup data to local storage", error);
+    }
     
-    setIsOtpSent(true);
-  };
-
-  const handleVerifyAndSignUp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!agreedToTerms || !agreedToPaymentPolicy) {
-       toast({
-        variant: 'destructive',
-        title: 'Agreement Required',
-        description: 'You must agree to the policies to continue.',
-      });
-      return;
-    }
-
-    // Simulate OTP verification
-    if (otp !== '123456') {
-      toast({
-        variant: 'destructive',
-        title: 'Invalid OTP',
-        description: 'The OTP you entered is incorrect. Please try again.',
-      });
-      return;
-    }
-
-    toast({
-        title: 'Account Created!',
-        description: 'Welcome to Knock! Redirecting you now...'
-    });
-
-    // In a real app, you'd create a user account here
-    setTimeout(() => {
-      router.push('/home');
-    }, 1000);
+    router.push(`/otp?mobile=${mobileNumber}`);
   };
 
   return (
@@ -102,40 +84,25 @@ export default function SignUpPage() {
           <CardDescription>Create an account to join the competition.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <form onSubmit={handleVerifyAndSignUp} className="space-y-4">
+          <form onSubmit={handleSignUp} className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
-                <Input id="name" type="text" placeholder="Alex Ray" required value={name} onChange={(e) => setName(e.target.value)} disabled={isOtpSent} />
+                <Input id="name" type="text" placeholder="Alex Ray" required value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="mobile-number">Mobile Number</Label>
-                <Input id="mobile-number" type="tel" placeholder="Enter your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} disabled={isOtpSent} />
+                <Input id="mobile-number" type="tel" placeholder="Enter your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="Create password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={isOtpSent} />
+                <Input id="password" type="password" placeholder="Create password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-
-            {isOtpSent && (
-              <div className="space-y-2 animate-in fade-in duration-500">
-                <Label htmlFor="otp">Enter OTP</Label>
-                <Input 
-                  id="otp" 
-                  type="tel" 
-                  placeholder="Enter 6-digit OTP" 
-                  required 
-                  value={otp} 
-                  onChange={(e) => setOtp(e.target.value)}
-                  maxLength={6}
-                  autoFocus
-                />
-              </div>
-            )}
             
             <div className="space-y-2">
               <Label htmlFor="coupon">Coupon Code (Optional)</Label>
               <Input id="coupon" placeholder="Have a referral code?" />
             </div>
+
             <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                     <Checkbox
@@ -167,16 +134,10 @@ export default function SignUpPage() {
                 </div>
             </div>
             
-            {!isOtpSent ? (
-              <Button onClick={handleSendOtp} className="w-full btn-gradient" disabled={isLoading || !mobileNumber || !name || !password}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
-                {isLoading ? 'Sending...' : 'Send OTP'}
-              </Button>
-            ) : (
-              <Button type="submit" className="w-full btn-gradient" disabled={!agreedToTerms || !agreedToPaymentPolicy || otp.length !== 6}>
-                  <UserPlus className="mr-2 h-4 w-4" /> Verify & Create Account
-              </Button>
-            )}
+            <Button type="submit" className="w-full btn-gradient" disabled={isLoading}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+                {isLoading ? 'Sending OTP...' : 'Create Account'}
+            </Button>
           </form>
           <div className="flex items-center space-x-2">
             <Separator className="flex-1" />
