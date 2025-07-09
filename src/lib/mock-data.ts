@@ -114,7 +114,7 @@ export const mockCompetitions: Competition[] = [
     status: 'Upcoming',
     participants: 4,
     totalSpots: 10,
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1594652634010-275456c808d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMnx8Z2FtZXxlbnwwfHx8fDE3NTIwNDk3Mjd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'desert landscape',
     startTime: 'Tomorrow at 3:00 PM'
   },
