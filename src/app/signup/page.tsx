@@ -26,9 +26,11 @@ export default function SignUpPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreedToTerms) return;
     // In a real app, you'd create a user account here
     router.push('/home');
   };
@@ -59,7 +61,20 @@ export default function SignUpPage() {
               <Label htmlFor="coupon">Coupon Code (Optional)</Label>
               <Input id="coupon" placeholder="Have a referral code?" />
             </div>
-            <Button type="submit" className="w-full btn-gradient">
+            <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={agreedToTerms}
+                  onCheckedChange={(checked) => setAgreedToTerms(Boolean(checked))}
+                />
+                <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground"
+                >
+                    I agree to the <Link href="/settings/terms" target="_blank" className="underline text-primary">Terms & Conditions</Link>
+                </label>
+            </div>
+            <Button type="submit" className="w-full btn-gradient" disabled={!agreedToTerms}>
                 <UserPlus className="mr-2 h-4 w-4" /> Create Account
             </Button>
           </form>
@@ -74,15 +89,6 @@ export default function SignUpPage() {
           </Button>
 
           <div className="space-y-2 text-center">
-            <div className="flex items-center space-x-2 justify-center">
-                <Checkbox id="terms" required />
-                <label
-                    htmlFor="terms"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground"
-                >
-                    I agree to the <Link href="#" className="underline text-primary">Terms & Conditions</Link>
-                </label>
-            </div>
              <p className="text-sm text-muted-foreground">
                 Already have an account? <Link href="/login" className="underline text-primary">Log In</Link>
             </p>
