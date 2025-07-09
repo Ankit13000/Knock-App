@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -23,8 +24,9 @@ const GoogleIcon = () => (
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToPaymentPolicy, setAgreedToPaymentPolicy] = useState(false);
@@ -32,6 +34,17 @@ export default function SignUpPage() {
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreedToTerms || !agreedToPaymentPolicy) return;
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(mobileNumber)) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Mobile Number',
+        description: 'Please enter a valid 10-digit mobile number.',
+      });
+      return;
+    }
+
     // In a real app, you'd create a user account here
     router.push('/home');
   };
@@ -51,8 +64,8 @@ export default function SignUpPage() {
                 <Input id="name" type="text" placeholder="Alex Ray" required value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="email">Email or Mobile Number</Label>
-                <Input id="email" type="email" placeholder="you@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Label htmlFor="mobile-number">Mobile Number</Label>
+                <Input id="mobile-number" type="tel" placeholder="Enter your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
