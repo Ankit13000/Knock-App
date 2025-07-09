@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -12,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { cn } from '@/lib/utils';
 
 const GAME_DURATION = 30; // seconds
-const MAX_WRONG_CLICKS = 3;
+const MAX_WRONG_CLICKS = 4;
 
 type Difference = {
   id: number;
