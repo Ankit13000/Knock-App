@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -11,7 +10,7 @@ import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
-const GAME_DURATION = 60; // seconds
+const GAME_DURATION = 30; // seconds
 
 type Difference = {
   id: number;
@@ -154,7 +153,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
       </div>
       
       {/* Game Area */}
-      <div className="flex w-full flex-1 flex-col gap-4 p-4 md:flex-row">
+      <div className="flex w-full flex-1 flex-col items-stretch gap-4 p-4 md:flex-row">
         {/* Image 1 (Reference) */}
         <div className="relative min-h-0 w-full flex-1 overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
              <Image 
