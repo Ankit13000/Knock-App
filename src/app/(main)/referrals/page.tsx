@@ -11,6 +11,10 @@ export default function ReferralsPage() {
     const { user } = useUser();
     const { toast } = useToast();
 
+    if (!user) {
+      return null; // Handled by UserProvider
+    }
+
     // Generate a mock referral code
     const referralCode = `${user.name.split(' ').join('').toUpperCase().slice(0, 5)}-${new Date().getFullYear()}`;
 

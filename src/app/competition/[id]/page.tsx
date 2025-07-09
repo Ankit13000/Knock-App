@@ -11,12 +11,14 @@ import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import type { Transaction } from '@/lib/types';
 import { ToastAction } from '@/components/ui/toast';
+import { doc, updateDoc, increment } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function CompetitionDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { competitions, addTransaction, updateCompetition } = useApp();
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const { toast } = useToast();
   
   const competition = competitions.find(c => c.id === params.id);
@@ -33,8 +35,8 @@ export default function CompetitionDetailPage() {
     )
   }
 
-  const handleJoin = () => {
-    if (!competition) return;
+  const handleJoin = async () => {
+    if (!competition || !user) return;
 
     if (competition.participants >= competition.totalSpots) {
         toast({
@@ -59,38 +61,48 @@ export default function CompetitionDetailPage() {
       return;
     }
 
-    // Deduct fee from wallet and update game count
-    setUser(prevUser => ({
-      ...prevUser,
-      walletBalance: prevUser.walletBalance - competition.entryFee,
-      totalGames: prevUser.totalGames + 1,
-    }));
+    const userDocRef = doc(db, 'users', user.id);
+    try {
+      // Atomically update wallet balance and game count in Firestore
+      await updateDoc(userDocRef, {
+        walletBalance: increment(-competition.entryFee),
+        totalGames: increment(1),
+      });
+      
+      // Create a new transaction
+      const newTransaction: Transaction = {
+        id: `txn_${new Date().getTime()}`,
+        userId: user.id,
+        userName: user.name,
+        type: 'Entry Fee',
+        amount: -competition.entryFee,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Completed',
+      };
+      addTransaction(newTransaction);
+      
+      // Update competition participant count locally (could also be a Firestore transaction)
+      const updatedCompetition = {
+        ...competition,
+        participants: competition.participants + 1,
+      };
+      updateCompetition(updatedCompetition);
 
-    // Create a new transaction
-    const newTransaction: Transaction = {
-      id: `txn_${new Date().getTime()}`,
-      userId: user.id,
-      userName: user.name,
-      type: 'Entry Fee',
-      amount: -competition.entryFee,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Completed',
-    };
-    addTransaction(newTransaction);
-    
-    // Update competition participant count
-    const updatedCompetition = {
-      ...competition,
-      participants: competition.participants + 1,
-    };
-    updateCompetition(updatedCompetition);
+      toast({
+        title: 'Joined Competition!',
+        description: `₹${competition.entryFee} has been deducted from your wallet. Good luck!`,
+      });
 
-    toast({
-      title: 'Joined Competition!',
-      description: `₹${competition.entryFee} has been deducted from your wallet. Good luck!`,
-    });
+      router.push(`/game/find-the-difference?id=${competition.id}`);
 
-    router.push(`/game/find-the-difference?id=${competition.id}`);
+    } catch (error) {
+      console.error("Failed to join competition:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Join Failed',
+        description: 'Could not process your entry. Please try again.',
+      });
+    }
   };
 
   const progress = (competition.participants / competition.totalSpots) * 100;
@@ -141,8 +153,8 @@ export default function CompetitionDetailPage() {
             <p className="text-center text-sm text-muted-foreground mt-2">{isFull ? 'Competition is full!' : `${competition.totalSpots - competition.participants} spots left!`}</p>
           </div>
           
-          <Button size="lg" className="w-full btn-gradient text-lg h-12" onClick={handleJoin} disabled={isFull}>
-            {isFull ? 'Competition Full' : 'Join Now'}
+          <Button size="lg" className="w-full btn-gradient text-lg h-12" onClick={handleJoin} disabled={isFull || !user}>
+            {isFull ? 'Competition Full' : (user ? 'Join Now' : 'Login to Join')}
           </Button>
 
           <div className="mt-8 p-4 bg-secondary rounded-lg text-sm text-muted-foreground">

@@ -10,6 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -20,38 +22,29 @@ const GoogleIcon = () => (
     </svg>
 );
 
-
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [mobileNumber, setMobileNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(mobileNumber)) {
-      toast({
-        variant: 'destructive',
-        title: 'Invalid Mobile Number',
-        description: 'Please enter a valid 10-digit mobile number.',
-      });
-      return;
-    }
-
     setIsLoading(true);
 
-    // Simulate API call to validate credentials and send OTP
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast({
-      title: 'OTP Sent!',
-      description: `A 6-digit code has been sent to ${mobileNumber}.`,
-    });
-    
-    router.push(`/otp?mobile=${mobileNumber}`);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/home');
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'Invalid email or password. Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,13 +53,13 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <Zap className="mx-auto h-12 w-12 text-primary" />
           <CardTitle className="text-3xl font-bold tracking-tighter">Welcome Back!</CardTitle>
-          <CardDescription>Enter your credentials to receive a login OTP.</CardDescription>
+          <CardDescription>Enter your credentials to access your account.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="mobile-number">Mobile Number</Label>
-                <Input id="mobile-number" type="tel" placeholder="Your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} disabled={isLoading} />
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" type="email" placeholder="you@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -78,7 +71,7 @@ export default function LoginPage() {
               ) : (
                 <LogIn className="mr-2 h-4 w-4" />
               )}
-              {isLoading ? 'Sending OTP...' : 'Login with OTP'}
+              {isLoading ? 'Logging In...' : 'Login'}
             </Button>
           </form>
           <div className="flex items-center space-x-2">
@@ -94,9 +87,6 @@ export default function LoginPage() {
           <div className="space-y-2 text-center">
              <p className="text-sm text-muted-foreground">
                 Don't have an account? <Link href="/signup" className="underline text-primary">Sign Up</Link>
-            </p>
-             <p className="text-sm text-muted-foreground">
-                <Link href="/home" className="underline">Continue as Guest</Link>
             </p>
           </div>
         </CardContent>

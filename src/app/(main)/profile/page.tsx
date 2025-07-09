@@ -17,6 +17,9 @@ import { Camera, Edit, Gamepad2, LogOut, ShieldCheck, Trash2, Trophy, Wallet } f
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { getInitials } from '@/lib/utils';
+import { signOut } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -25,10 +28,27 @@ const profileFormSchema = z.object({
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const { user, firebaseUser } = useUser();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const form = useForm<z.infer<typeof profileFormSchema>>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      name: user?.name || '',
+    },
+  });
+
+  useEffect(() => {
+    if (user) {
+      form.reset({ name: user.name });
+    }
+  }, [user, form]);
+  
+  if (!user) {
+    return null; // Or a loading spinner, handled by UserProvider
+  }
 
   const stats = [
     { icon: Gamepad2, label: 'Total Games', value: user.totalGames },
@@ -36,53 +56,81 @@ export default function ProfilePage() {
     { icon: Wallet, label: 'Total Earned', value: `₹${user.totalEarned.toLocaleString()}`},
   ];
 
-  const form = useForm<z.infer<typeof profileFormSchema>>({
-    resolver: zodResolver(profileFormSchema),
-    defaultValues: {
-      name: user.name,
-    },
-  });
-
-  useEffect(() => {
-    form.reset({ name: user.name });
-  }, [user.name, form]);
-
-  function onSubmit(values: z.infer<typeof profileFormSchema>) {
-    setUser(prevUser => ({...prevUser, name: values.name}));
-    toast({
-      title: "Profile Updated",
-      description: "Your name has been successfully updated.",
-    });
-    setIsEditDialogOpen(false);
+  async function onSubmit(values: z.infer<typeof profileFormSchema>) {
+    if (!firebaseUser) return;
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    try {
+        await updateDoc(userDocRef, { name: values.name });
+        toast({
+          title: "Profile Updated",
+          description: "Your name has been successfully updated.",
+        });
+        setIsEditDialogOpen(false);
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Update Failed",
+            description: "Could not update your profile. Please try again.",
+        });
+    }
   }
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!firebaseUser) return;
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setUser(prevUser => ({...prevUser, avatar: reader.result as string}));
-        toast({
-          title: "Profile Picture Updated",
-          description: "Your new picture has been saved.",
-        });
+      reader.onloadend = async () => {
+        const dataUrl = reader.result as string;
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        try {
+            await updateDoc(userDocRef, { avatar: dataUrl });
+            toast({
+              title: "Profile Picture Updated",
+              description: "Your new picture has been saved.",
+            });
+        } catch(error) {
+            toast({
+                variant: "destructive",
+                title: "Upload Failed",
+                description: "Could not save your new picture.",
+            });
+        }
       };
       reader.readAsDataURL(file);
     }
   };
   
-  const handleRemoveAvatar = () => {
-    setUser(prevUser => ({...prevUser, avatar: null}));
-    toast({
-      title: "Profile Picture Removed",
-      description: "Your default avatar will be shown.",
-    });
+  const handleRemoveAvatar = async () => {
+    if (!firebaseUser) return;
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    try {
+      await updateDoc(userDocRef, { avatar: null });
+      toast({
+        title: "Profile Picture Removed",
+        description: "Your default avatar will be shown.",
+      });
+    } catch(error) {
+        toast({
+            variant: "destructive",
+            title: "Update Failed",
+            description: "Could not remove your picture.",
+        });
+    }
   }
 
-  const handleLogout = () => {
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/login');
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Logout Failed",
+        description: "Could not log you out. Please try again.",
+      });
+    }
   };
-
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">

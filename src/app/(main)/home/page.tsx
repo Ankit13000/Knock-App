@@ -10,6 +10,10 @@ export default function HomePage() {
   const { competitions, gameTypes } = useApp();
   const { user } = useUser();
 
+  if (!user) {
+    return null; // Or a loading skeleton, handled by UserProvider
+  }
+
   return (
     <div className="space-y-8">
       <div>

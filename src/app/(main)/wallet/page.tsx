@@ -11,19 +11,25 @@ import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import type { Transaction } from '@/lib/types';
 import { useApp } from '@/context/AppContext';
+import { doc, updateDoc, increment } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const quickAddAmounts = [100, 250, 500];
 
 export default function WalletPage() {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const { toast } = useToast();
   const { transactions, addTransaction } = useApp();
   const [customAmount, setCustomAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
 
+  if (!user) {
+    return null; // Or a loading component
+  }
+  
   const userTransactions = transactions.filter(tx => tx.userId === user.id);
 
-  const handleAddMoney = (amount: number) => {
+  const handleAddMoney = async (amount: number) => {
     if (isNaN(amount) || amount <= 0) {
       toast({
         variant: 'destructive',
@@ -33,29 +39,35 @@ export default function WalletPage() {
       return;
     }
 
-    setUser(prevUser => ({
-      ...prevUser,
-      walletBalance: prevUser.walletBalance + amount,
-    }));
+    const userDocRef = doc(db, 'users', user.id);
+    try {
+      await updateDoc(userDocRef, { walletBalance: increment(amount) });
+      
+      const newTransaction: Transaction = {
+        id: Date.now().toString(),
+        userId: user.id,
+        userName: user.name,
+        type: 'Deposit',
+        amount: amount,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Completed',
+      };
+      addTransaction(newTransaction);
+      
+      setCustomAmount('');
+      toast({
+        title: 'Success!',
+        description: `₹${amount.toLocaleString()} has been added to your wallet.`,
+      });
 
-    const newTransaction: Transaction = {
-      id: Date.now().toString(),
-      userId: user.id,
-      userName: user.name,
-      type: 'Deposit',
-      amount: amount,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Completed',
-    };
-
-    addTransaction(newTransaction);
-    
-    setCustomAmount('');
-
-    toast({
-      title: 'Success!',
-      description: `₹${amount.toLocaleString()} has been added to your wallet.`,
-    });
+    } catch (error) {
+      console.error("Failed to add funds: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to add funds to your wallet.',
+      });
+    }
   };
 
   const handleCustomAmountSubmit = () => {
@@ -63,7 +75,7 @@ export default function WalletPage() {
     handleAddMoney(amount);
   }
 
-  const handleWithdrawMoney = (amount: number) => {
+  const handleWithdrawMoney = async (amount: number) => {
     if (isNaN(amount) || amount <= 0) {
       toast({
         variant: 'destructive',
@@ -82,28 +94,33 @@ export default function WalletPage() {
       return;
     }
 
-    setUser(prevUser => ({
-      ...prevUser,
-      walletBalance: prevUser.walletBalance - amount,
-    }));
+    const userDocRef = doc(db, 'users', user.id);
+    try {
+      await updateDoc(userDocRef, { walletBalance: increment(-amount) });
 
-    const newTransaction: Transaction = {
-      id: Date.now().toString(),
-      userId: user.id,
-      userName: user.name,
-      type: 'Withdrawal',
-      amount: -amount,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Pending',
-    };
-
-    addTransaction(newTransaction);
-    setWithdrawAmount('');
-
-    toast({
-      title: 'Withdrawal Initiated',
-      description: `Your request to withdraw ₹${amount.toLocaleString()} has been submitted.`,
-    });
+      const newTransaction: Transaction = {
+        id: Date.now().toString(),
+        userId: user.id,
+        userName: user.name,
+        type: 'Withdrawal',
+        amount: -amount,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Pending',
+      };
+      addTransaction(newTransaction);
+      setWithdrawAmount('');
+      toast({
+        title: 'Withdrawal Initiated',
+        description: `Your request to withdraw ₹${amount.toLocaleString()} has been submitted.`,
+      });
+    } catch (error) {
+       console.error("Failed to withdraw funds: ", error);
+       toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to process your withdrawal request.',
+      });
+    }
   };
 
   const handleCustomWithdrawSubmit = () => {

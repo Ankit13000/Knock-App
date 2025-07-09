@@ -11,6 +11,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+import type { User } from '@/lib/types';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -21,12 +25,11 @@ const GoogleIcon = () => (
     </svg>
 );
 
-
 export default function SignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [name, setName] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToPaymentPolicy, setAgreedToPaymentPolicy] = useState(false);
@@ -43,36 +46,50 @@ export default function SignUpPage() {
       });
       return;
     }
-
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(mobileNumber)) {
-      toast({
-        variant: 'destructive',
-        title: 'Invalid Mobile Number',
-        description: 'Please enter a valid 10-digit mobile number.',
-      });
-      return;
-    }
     
     setIsLoading(true);
-    // Simulate API call to send OTP
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast({
-      title: 'OTP Sent!',
-      description: `A 6-digit code has been sent to ${mobileNumber}.`,
-    });
-
-    // Store user data to be used on OTP page.
-    // In a real app, you might get a session token from the backend to reference this data.
     try {
-        const signupData = { name, password };
-        localStorage.setItem('signupData', JSON.stringify(signupData));
-    } catch (error) {
-        console.error("Could not save signup data to local storage", error);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+
+      const newUserProfile: Omit<User, 'id'> = {
+        name: name,
+        email: firebaseUser.email!,
+        joinDate: new Date().toISOString().split('T')[0],
+        avatar: null,
+        walletBalance: 0,
+        wins: 0,
+        totalGames: 0,
+        totalEarned: 0,
+        isBanned: false,
+      };
+
+      await setDoc(doc(db, "users", firebaseUser.uid), newUserProfile);
+      
+      toast({
+        title: 'Account Created!',
+        description: 'Welcome to Knock! Redirecting you now...',
+      });
+      
+      router.push('/home');
+
+    } catch (error: any) {
+        let errorMessage = 'An unknown error occurred.';
+        if (error.code === 'auth/email-already-in-use') {
+            errorMessage = 'This email address is already in use.';
+        } else if (error.code === 'auth/weak-password') {
+            errorMessage = 'The password is too weak. Please use at least 6 characters.';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'Please enter a valid email address.';
+        }
+        toast({
+            variant: 'destructive',
+            title: 'Sign Up Failed',
+            description: errorMessage,
+        });
+    } finally {
+      setIsLoading(false);
     }
-    
-    router.push(`/otp?mobile=${mobileNumber}`);
   };
 
   return (
@@ -90,12 +107,12 @@ export default function SignUpPage() {
                 <Input id="name" type="text" placeholder="Alex Ray" required value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="mobile-number">Mobile Number</Label>
-                <Input id="mobile-number" type="tel" placeholder="Enter your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} />
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" type="email" placeholder="you@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="Create password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input id="password" type="password" placeholder="Create a secure password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             
             <div className="space-y-2">
@@ -136,7 +153,7 @@ export default function SignUpPage() {
             
             <Button type="submit" className="w-full btn-gradient" disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-                {isLoading ? 'Sending OTP...' : 'Create Account'}
+                {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
           <div className="flex items-center space-x-2">
