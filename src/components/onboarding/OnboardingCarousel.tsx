@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -89,7 +90,7 @@ const AnimatedBorder = () => (
 
 export function OnboardingCarousel() {
   const plugin = React.useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: true, stopOnLastSnap: true })
+    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnLastSnap: true })
   );
 
   const [api, setApi] = React.useState<CarouselApi>();
@@ -100,14 +101,25 @@ export function OnboardingCarousel() {
       return;
     }
 
-    setCurrent(api.selectedScrollSnap());
     const handleSelect = () => {
-        setCurrent(api.selectedScrollSnap());
+      setCurrent(api.selectedScrollSnap());
+      const autoplay = api.plugins().autoplay;
+      if (!autoplay) return;
+
+      // If user navigates away from last slide, restart autoplay.
+      // `stopOnLastSnap: true` in the plugin options handles the stopping.
+      if (api.selectedScrollSnap() !== api.scrollSnapList().length - 1) {
+        autoplay.play();
+      }
     };
+
     api.on('select', handleSelect);
+    
+    // Initial check
+    handleSelect();
 
     return () => {
-        api.off('select', handleSelect);
+      api.off('select', handleSelect);
     };
   }, [api]);
 
