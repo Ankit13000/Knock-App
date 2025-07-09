@@ -9,8 +9,10 @@ import { Progress } from '@/components/ui/progress';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 
 const GAME_DURATION = 30; // seconds
+const MAX_WRONG_CLICKS = 3;
 
 type Difference = {
   id: number;
@@ -40,6 +42,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [differences, setDifferences] = useState<Difference[]>(initialDifferences);
   const [score, setScore] = useState(0);
+  const [wrongClicks, setWrongClicks] = useState(0);
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong'; x: number; y: number } | null>(null);
   const [isQuitConfirmOpen, setIsQuitConfirmOpen] = useState(false);
 
@@ -84,8 +87,17 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     const target = e.target as HTMLElement;
     if (target.closest('[data-ishotspot="true"]')) return;
     
+    const newWrongClicks = wrongClicks + 1;
+
     setScore(prev => Math.max(0, prev - 20));
     setFeedback({ type: 'wrong', x: e.clientX, y: e.clientY });
+
+    if (newWrongClicks >= MAX_WRONG_CLICKS) {
+      // Game over
+      setTimeout(() => router.push(`/results?score=0&status=lost`), 500);
+    } else {
+      setWrongClicks(newWrongClicks);
+    }
   };
   
   const handleQuit = () => {
@@ -101,9 +113,9 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     );
   }
   
-  const GameStat = ({ icon: Icon, value, label, className }: { icon: React.ElementType, value: string | number, label: string, className?: string }) => (
-    <div className={`flex items-center gap-3 text-white px-4 py-2 rounded-full bg-black/30 backdrop-blur-sm ${className}`}>
-        <Icon className="h-6 w-6" />
+  const GameStat = ({ icon: Icon, value, label, iconClassName }: { icon: React.ElementType, value: string | number, label: string, iconClassName?: string }) => (
+    <div className="flex items-center gap-3 rounded-full bg-black/30 px-4 py-2 text-white backdrop-blur-sm">
+        <Icon className={cn("h-6 w-6", iconClassName)} />
         <div className="text-left">
             <div className="text-sm font-semibold tracking-wider">{label}</div>
             <div className="text-xl font-bold">{value}</div>
@@ -112,7 +124,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   );
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-gray-900 text-white relative overflow-hidden">
+    <div className="relative flex h-full w-full flex-col items-center overflow-hidden bg-gray-900 text-white">
       {/* Vignette effect */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/50"></div>
       
@@ -155,7 +167,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
       {/* Game Area */}
       <div className="flex w-full flex-1 flex-col items-stretch gap-4 p-4 md:flex-row">
         {/* Image 1 (Reference) */}
-        <div className="relative min-h-0 w-full flex-1 overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
+        <div className="relative flex min-h-0 flex-1 flex-col justify-center overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
              <Image 
                 src={competition.image} 
                 alt="Find the difference reference" 
@@ -164,8 +176,9 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
                 priority
                 data-ai-hint={competition.imageHint} 
              />
-             <div className="absolute bottom-4 left-4">
-                 <GameStat icon={Target} value={score} label="Score" className="text-primary" />
+             <div className="absolute bottom-4 left-4 flex flex-col gap-2">
+                 <GameStat icon={Target} value={score} label="Score" iconClassName="text-primary" />
+                 <GameStat icon={XCircle} value={`${MAX_WRONG_CLICKS - wrongClicks}`} label="Tries Left" iconClassName="text-destructive" />
              </div>
         </div>
         
@@ -194,7 +207,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
                 </div>
             ))}
              <div className="absolute bottom-4 right-4">
-                 <GameStat icon={Clock} value={`${timeLeft}s`} label="Time Left" className="text-accent" />
+                 <GameStat icon={Clock} value={`${timeLeft}s`} label="Time Left" iconClassName="text-accent" />
              </div>
         </div>
       </div>

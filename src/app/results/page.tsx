@@ -24,12 +24,29 @@ function ResultsPageContent() {
   const statusParam = searchParams.get('status');
 
   const isForfeited = statusParam === 'forfeited';
-  const score = isForfeited ? 0 : parseInt(scoreParam || '0', 10);
+  const isLost = statusParam === 'lost';
+  const isGameOver = isForfeited || isLost;
+  const score = isGameOver ? 0 : parseInt(scoreParam || '0', 10);
   
   const { rank, winnings } = calculateResults(score);
   
-  const title = isForfeited ? "Game Forfeited" : (winnings > 0 ? "Congratulations!" : "Good Game!");
-  const description = isForfeited ? "You left the game early." : "Here's how you performed.";
+  let title;
+  let description;
+
+  if (isForfeited) {
+    title = "Game Forfeited";
+    description = "You left the game early.";
+  } else if (isLost) {
+    title = "Too Many Mistakes!";
+    description = "You lost the game after 3 incorrect clicks.";
+  } else if (winnings > 0) {
+    title = "Congratulations!";
+    description = "Here's how you performed.";
+  } else {
+    title = "Good Game!";
+    description = "Here's how you performed.";
+  }
+
 
   const stats = [
     { icon: CheckCircle, label: 'Your Score', value: score.toLocaleString(), color: 'text-accent' },
@@ -41,7 +58,7 @@ function ResultsPageContent() {
     <div className="flex min-h-screen items-center justify-center bg-grid-pattern p-4">
       <Card className="w-full max-w-md text-center shadow-2xl shadow-primary/10">
         <CardHeader>
-          {isForfeited ? (
+          {isGameOver ? (
             <XCircle className="mx-auto h-16 w-16 text-destructive" />
           ) : (
             <Trophy className="mx-auto h-16 w-16 text-accent" />
@@ -52,7 +69,7 @@ function ResultsPageContent() {
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {!isForfeited && (
+          {!isGameOver && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {stats.map(stat => (
                 <div key={stat.label} className="p-4 bg-card rounded-lg">
@@ -67,7 +84,7 @@ function ResultsPageContent() {
           <div className="p-4 bg-secondary rounded-lg">
             <h4 className="font-semibold text-foreground">Next Steps</h4>
             <p className="text-sm text-muted-foreground">
-                {isForfeited ? 'Why not try another game?' : 'Check the full leaderboard for final standings.'}
+                {isGameOver ? 'Why not try another game?' : 'Check the full leaderboard for final standings.'}
             </p>
           </div>
           
