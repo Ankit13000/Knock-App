@@ -2,13 +2,22 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, ChevronLeft, Ticket, Trophy, Users, Clock } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { useUser } from '@/context/UserContext';
+import { useToast } from '@/hooks/use-toast';
+import type { Transaction } from '@/lib/types';
+import { ToastAction } from '@/components/ui/toast';
 
 export default function CompetitionDetailPage({ params }: { params: { id: string } }) {
-  const { competitions } = useApp();
+  const router = useRouter();
+  const { competitions, addTransaction, updateCompetition } = useApp();
+  const { user, setUser } = useUser();
+  const { toast } = useToast();
+  
   const competition = competitions.find(c => c.id === params.id);
 
   if (!competition) {
@@ -23,7 +32,68 @@ export default function CompetitionDetailPage({ params }: { params: { id: string
     )
   }
 
+  const handleJoin = () => {
+    if (!competition) return;
+
+    if (competition.participants >= competition.totalSpots) {
+        toast({
+            variant: 'destructive',
+            title: 'Competition Full',
+            description: 'Sorry, all spots for this competition have been taken.',
+        });
+        return;
+    }
+
+    if (user.walletBalance < competition.entryFee) {
+      toast({
+        variant: 'destructive',
+        title: 'Insufficient Funds',
+        description: `You need ₹${competition.entryFee.toFixed(2)} to join. Your balance is ₹${user.walletBalance.toFixed(2)}.`,
+        action: (
+          <ToastAction altText="Add Funds" onClick={() => router.push('/wallet')}>
+            Add Funds
+          </ToastAction>
+        ),
+      });
+      return;
+    }
+
+    // Deduct fee from wallet and update game count
+    setUser(prevUser => ({
+      ...prevUser,
+      walletBalance: prevUser.walletBalance - competition.entryFee,
+      totalGames: prevUser.totalGames + 1,
+    }));
+
+    // Create a new transaction
+    const newTransaction: Transaction = {
+      id: `txn_${new Date().getTime()}`,
+      userId: user.id,
+      userName: user.name,
+      type: 'Entry Fee',
+      amount: -competition.entryFee,
+      date: new Date().toISOString().split('T')[0],
+      status: 'Completed',
+    };
+    addTransaction(newTransaction);
+    
+    // Update competition participant count
+    const updatedCompetition = {
+      ...competition,
+      participants: competition.participants + 1,
+    };
+    updateCompetition(updatedCompetition);
+
+    toast({
+      title: 'Joined Competition!',
+      description: `₹${competition.entryFee} has been deducted from your wallet. Good luck!`,
+    });
+
+    router.push(`/game/find-the-difference?id=${competition.id}`);
+  };
+
   const progress = (competition.participants / competition.totalSpots) * 100;
+  const isFull = competition.participants >= competition.totalSpots;
 
   const details = [
     { icon: Trophy, label: 'Prize Pool', value: `₹${competition.prize}`, color: 'text-amber-400' },
@@ -67,14 +137,12 @@ export default function CompetitionDetailPage({ params }: { params: { id: string
             <div className="relative h-4 w-full overflow-hidden rounded-full bg-secondary">
               <div className="absolute h-full bg-gradient-to-r from-primary to-accent transition-all" style={{width: `${progress}%`}}></div>
             </div>
-            <p className="text-center text-sm text-muted-foreground mt-2">{competition.totalSpots - competition.participants} spots left!</p>
+            <p className="text-center text-sm text-muted-foreground mt-2">{competition.totalSpots - competition.participants > 0 ? `${competition.totalSpots - competition.participants} spots left!` : 'Competition is full!'}</p>
           </div>
           
-          <Link href={`/game/find-the-difference?id=${competition.id}`} className="w-full">
-            <Button size="lg" className="w-full btn-gradient text-lg h-12">
-                Join Now
-            </Button>
-          </Link>
+          <Button size="lg" className="w-full btn-gradient text-lg h-12" onClick={handleJoin} disabled={isFull}>
+            {isFull ? 'Competition Full' : 'Join Now'}
+          </Button>
 
           <div className="mt-8 p-4 bg-secondary rounded-lg text-sm text-muted-foreground">
             <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
