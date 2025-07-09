@@ -74,14 +74,26 @@ export default function SignUpPage() {
       router.push('/home');
 
     } catch (error: any) {
-        let errorMessage = 'An unknown error occurred.';
-        if (error.code === 'auth/email-already-in-use') {
-            errorMessage = 'This email address is already in use.';
-        } else if (error.code === 'auth/weak-password') {
-            errorMessage = 'The password is too weak. Please use at least 6 characters.';
-        } else if (error.code === 'auth/invalid-email') {
-            errorMessage = 'Please enter a valid email address.';
+        console.error("Sign-up error:", error); // For debugging purposes
+
+        let errorMessage = 'An unknown error occurred. Please check your connection and try again.';
+        if (error.code) {
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              errorMessage = 'This email address is already in use by another account.';
+              break;
+            case 'auth/weak-password':
+              errorMessage = 'The password is too weak. Please use at least 6 characters.';
+              break;
+            case 'auth/invalid-email':
+              errorMessage = 'The email address is not valid.';
+              break;
+            default:
+              errorMessage = error.message || 'An unexpected error occurred.';
+              break;
+          }
         }
+        
         toast({
             variant: 'destructive',
             title: 'Sign Up Failed',
