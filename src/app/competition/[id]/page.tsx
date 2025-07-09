@@ -138,7 +138,7 @@ export default function CompetitionDetailPage() {
             <div className="relative h-4 w-full overflow-hidden rounded-full bg-secondary">
               <div className="absolute h-full bg-gradient-to-r from-primary to-accent transition-all" style={{width: `${progress}%`}}></div>
             </div>
-            <p className="text-center text-sm text-muted-foreground mt-2">{competition.totalSpots - competition.participants > 0 ? `${competition.totalSpots - competition.participants} spots left!` : 'Competition is full!'}</p>
+            <p className="text-center text-sm text-muted-foreground mt-2">{isFull ? 'Competition is full!' : `${competition.totalSpots - competition.participants} spots left!`}</p>
           </div>
           
           <Button size="lg" className="w-full btn-gradient text-lg h-12" onClick={handleJoin} disabled={isFull}>
