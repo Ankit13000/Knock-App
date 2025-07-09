@@ -90,7 +90,7 @@ const AnimatedBorder = () => (
 
 export function OnboardingCarousel() {
   const plugin = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnLastSnap: true })
+    Autoplay({ delay: 4000, stopOnInteraction: true, stopOnLastSnap: true })
   );
 
   const [api, setApi] = React.useState<CarouselApi>();
