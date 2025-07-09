@@ -54,9 +54,10 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     }
   }, [competitionId, router]);
 
+  // Main game loop for timer and win condition
   useEffect(() => {
-    if (isQuitConfirmOpen) {
-      return; // Pause timer when dialog is open
+    if (isQuitConfirmOpen || wrongClicks >= MAX_WRONG_CLICKS) {
+      return; // Pause timer when dialog is open or game is lost
     }
 
     if (timeLeft <= 0 || (competition && foundCount === differences.length)) {
@@ -69,7 +70,15 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, foundCount, router, competition, score, isQuitConfirmOpen]);
+  }, [timeLeft, foundCount, router, competition, score, isQuitConfirmOpen, wrongClicks]);
+  
+  // Game over check for too many wrong clicks
+  useEffect(() => {
+    if (wrongClicks >= MAX_WRONG_CLICKS) {
+      const timer = setTimeout(() => router.push(`/results?status=lost&score=0`), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [wrongClicks, router]);
 
   const handleFeedbackEnd = () => setFeedback(null);
 
@@ -87,17 +96,9 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     const target = e.target as HTMLElement;
     if (target.closest('[data-ishotspot="true"]')) return;
     
-    const newWrongClicks = wrongClicks + 1;
-
     setScore(prev => Math.max(0, prev - 20));
     setFeedback({ type: 'wrong', x: e.clientX, y: e.clientY });
-
-    if (newWrongClicks >= MAX_WRONG_CLICKS) {
-      // Game over
-      setTimeout(() => router.push(`/results?score=0&status=lost`), 500);
-    } else {
-      setWrongClicks(newWrongClicks);
-    }
+    setWrongClicks(prev => prev + 1);
   };
   
   const handleQuit = () => {
@@ -124,14 +125,14 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   );
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center overflow-hidden bg-gray-900 text-white">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-gray-900 text-white">
       {/* Vignette effect */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/50"></div>
       
       {/* Top Bar */}
-      <div className="z-10 w-full p-4">
+      <div className="z-10 flex w-full flex-col p-4 md:gap-4">
         <Progress value={(timeLeft / GAME_DURATION) * 100} className="h-2 [&>div]:bg-gradient-to-r [&>div]:from-accent [&>div]:to-primary" />
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4 md:mt-0">
             <div className="flex items-center gap-4">
                 <h1 className="text-2xl font-bold tracking-tighter">{competition.title}</h1>
                 <div className="flex items-center gap-2">
@@ -165,7 +166,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
       </div>
       
       {/* Game Area */}
-      <div className="flex w-full flex-1 flex-col items-stretch gap-4 p-4 md:flex-row">
+      <div className="flex w-full flex-1 flex-col items-stretch gap-4 p-4 pt-0 md:flex-row md:p-4">
         {/* Image 1 (Reference) */}
         <div className="relative flex min-h-0 flex-1 flex-col justify-center overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
              <Image 
