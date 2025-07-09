@@ -25,10 +25,10 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [competitions, setCompetitions] = useState<Competition[]>(mockCompetitions);
-  const [users, setUsers] = useState<User[]>(mockAdminUsers);
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
-  const [gameTypes, setGameTypes] = useState<GameType[]>(mockGameTypes);
+  const [competitions, setCompetitions] = useState<Competition[]>(() => JSON.parse(JSON.stringify(mockCompetitions)));
+  const [users, setUsers] = useState<User[]>(() => JSON.parse(JSON.stringify(mockAdminUsers)));
+  const [transactions, setTransactions] = useState<Transaction[]>(() => JSON.parse(JSON.stringify(mockTransactions)));
+  const [gameTypes, setGameTypes] = useState<GameType[]>(() => JSON.parse(JSON.stringify(mockGameTypes)));
 
   const addCompetition = (competition: Competition) => {
     setCompetitions(prev => [competition, ...prev]);
