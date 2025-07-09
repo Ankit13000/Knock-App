@@ -99,7 +99,7 @@ export default function CompetitionsPage() {
                     <TableCell>{comp.gameType}</TableCell>
                     <TableCell>
                       <Badge variant={
-                        comp.status === 'Live' ? 'default' :
+                        comp.status === 'Live' ? 'positive' :
                         comp.status === 'Upcoming' ? 'secondary' : 'outline'
                       }>
                         {comp.status}

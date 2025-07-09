@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
                     <TableCell className="font-medium">{comp.title}</TableCell>
                     <TableCell>
                        <Badge variant={
-                          comp.status === 'Live' ? 'default' :
+                          comp.status === 'Live' ? 'positive' :
                           comp.status === 'Upcoming' ? 'secondary' : 'outline'
                         }>
                           {comp.status}
