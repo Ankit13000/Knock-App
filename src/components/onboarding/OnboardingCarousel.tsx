@@ -39,33 +39,49 @@ const onboardingSteps = [
 
 const AnimatedBorder = () => (
     <div className="absolute inset-0 pointer-events-none">
-        {/* Top */}
+        {/* Top-left bar */}
         <motion.div
-            className="absolute top-0 left-0 h-1 bg-gradient-to-r from-primary to-accent"
+            className="absolute top-0 right-[50%] h-1 bg-gradient-to-l from-primary to-accent"
             initial={{ width: '0%' }}
-            animate={{ width: '100%' }}
-            transition={{ duration: 0.75, ease: 'linear', delay: 0 }}
+            animate={{ width: '50%' }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 0 }}
         />
-        {/* Right */}
+        {/* Top-right bar */}
         <motion.div
-            className="absolute top-0 right-0 w-1 bg-gradient-to-b from-accent to-primary"
+            className="absolute top-0 left-[50%] h-1 bg-gradient-to-r from-primary to-accent"
+            initial={{ width: '0%' }}
+            animate={{ width: '50%' }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 0 }}
+        />
+
+        {/* Left bar */}
+        <motion.div
+            className="absolute top-0 left-0 w-1 bg-gradient-to-b from-primary to-accent"
             initial={{ height: '0%' }}
             animate={{ height: '100%' }}
-            transition={{ duration: 0.75, ease: 'linear', delay: 0.75 }}
+            transition={{ duration: 1, ease: 'linear', delay: 1.5 }}
         />
-        {/* Bottom */}
+        {/* Right bar */}
         <motion.div
-            className="absolute bottom-0 right-0 h-1 bg-gradient-to-l from-primary to-accent"
-            initial={{ width: '0%' }}
-            animate={{ width: '100%' }}
-            transition={{ duration: 0.75, ease: 'linear', delay: 1.5 }}
-        />
-        {/* Left */}
-        <motion.div
-            className="absolute bottom-0 left-0 w-1 bg-gradient-to-t from-accent to-primary"
+            className="absolute top-0 right-0 w-1 bg-gradient-to-b from-primary to-accent"
             initial={{ height: '0%' }}
             animate={{ height: '100%' }}
-            transition={{ duration: 0.75, ease: 'linear', delay: 2.25 }}
+            transition={{ duration: 1, ease: 'linear', delay: 1.5 }}
+        />
+        
+        {/* Bottom-left bar */}
+        <motion.div
+            className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-accent to-primary"
+            initial={{ width: '0%' }}
+            animate={{ width: '50%' }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 2.5 }}
+        />
+        {/* Bottom-right bar */}
+        <motion.div
+            className="absolute bottom-0 right-0 h-1 bg-gradient-to-l from-accent to-primary"
+            initial={{ width: '0%' }}
+            animate={{ width: '50%' }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 2.5 }}
         />
     </div>
 );
@@ -73,7 +89,7 @@ const AnimatedBorder = () => (
 
 export function OnboardingCarousel() {
   const plugin = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnLastSnap: true })
+    Autoplay({ delay: 4000, stopOnInteraction: true, stopOnLastSnap: true })
   );
 
   const [api, setApi] = React.useState<CarouselApi>();
