@@ -38,7 +38,7 @@ function ResultsPageContent() {
     description = "You left the game early.";
   } else if (isLost) {
     title = "Too Many Mistakes!";
-    description = "You lost the game after 3 incorrect clicks.";
+    description = "You lost the game after 4 incorrect clicks.";
   } else if (winnings > 0) {
     title = "Congratulations!";
     description = "Here's how you performed.";
