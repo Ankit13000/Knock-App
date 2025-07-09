@@ -38,7 +38,7 @@ const onboardingSteps = [
 
 export function OnboardingCarousel() {
   const plugin = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: true })
+    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnLastSnap: true })
   );
 
   return (
@@ -63,14 +63,35 @@ export function OnboardingCarousel() {
                       className="aspect-video w-full object-cover"
                       data-ai-hint={step.imageHint}
                     />
-                    <div className="absolute bottom-0 left-0 h-1 w-full bg-background/30">
-                       <motion.div
-                        key={index} // Re-triggers animation on each slide
-                        className="h-full bg-gradient-to-r from-primary to-accent"
-                        initial={{ width: '0%' }}
-                        animate={{ width: '100%' }}
-                        transition={{ duration: 3, ease: 'linear' }}
-                      />
+                    <div key={index} className="absolute inset-0 pointer-events-none">
+                        {/* Top */}
+                        <motion.div
+                            className="absolute top-0 left-0 h-1 bg-gradient-to-r from-primary to-accent"
+                            initial={{ width: '0%' }}
+                            animate={{ width: '100%' }}
+                            transition={{ duration: 0.75, ease: 'linear', delay: 0 }}
+                        />
+                        {/* Right */}
+                        <motion.div
+                            className="absolute top-0 right-0 w-1 bg-gradient-to-b from-accent to-primary"
+                            initial={{ height: '0%' }}
+                            animate={{ height: '100%' }}
+                            transition={{ duration: 0.75, ease: 'linear', delay: 0.75 }}
+                        />
+                        {/* Bottom */}
+                        <motion.div
+                            className="absolute bottom-0 right-0 h-1 bg-gradient-to-l from-primary to-accent"
+                            initial={{ width: '0%' }}
+                            animate={{ width: '100%' }}
+                            transition={{ duration: 0.75, ease: 'linear', delay: 1.5 }}
+                        />
+                        {/* Left */}
+                         <motion.div
+                            className="absolute bottom-0 left-0 w-1 bg-gradient-to-t from-accent to-primary"
+                            initial={{ height: '0%' }}
+                            animate={{ height: '100%' }}
+                            transition={{ duration: 0.75, ease: 'linear', delay: 2.25 }}
+                        />
                     </div>
                   </div>
                   <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
