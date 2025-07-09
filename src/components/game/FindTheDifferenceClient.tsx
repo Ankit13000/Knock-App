@@ -58,34 +58,31 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
 
   // Main game loop for timer and win condition
   useEffect(() => {
-    // Game already over or paused, do nothing.
-    if (isGameOver || isQuitConfirmOpen || wrongClicks >= MAX_WRONG_CLICKS) {
-      return;
-    }
+    if (isGameOver) return;
 
     const isFinished = timeLeft <= 0 || (competition && foundCount === differences.length);
 
     if (isFinished) {
       setIsGameOver(true);
-      // Wait a bit before redirecting to show the final answers
       setTimeout(() => router.push(`/results?score=${score}`), 4000); // 4-second delay
       return;
     }
 
-    const timer = setInterval(() => {
-      setTimeLeft(prev => Math.max(0, prev - 1));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft, foundCount, router, competition, score, isQuitConfirmOpen, wrongClicks, isGameOver]);
+    if (!isQuitConfirmOpen) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [timeLeft, foundCount, router, competition, score, isQuitConfirmOpen, isGameOver]);
   
   // Game over check for too many wrong clicks
   useEffect(() => {
-    if (wrongClicks >= MAX_WRONG_CLICKS) {
-      const timer = setTimeout(() => router.push(`/results?status=lost&score=0`), 500);
-      return () => clearTimeout(timer);
+    if (wrongClicks >= MAX_WRONG_CLICKS && !isGameOver) {
+      setIsGameOver(true);
+      setTimeout(() => router.push(`/results?status=lost&score=0`), 4000);
     }
-  }, [wrongClicks, router]);
+  }, [wrongClicks, router, isGameOver]);
 
   const handleFeedbackEnd = () => setFeedback(null);
 
@@ -99,7 +96,6 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   };
   
   const handleWrongClick = (e: React.MouseEvent) => {
-    // Check if the click was on an already found circle or a hotspot
     const target = e.target as HTMLElement;
     if (target.closest('[data-ishotspot="true"]')) return;
     
@@ -186,7 +182,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
              />
              <div className="absolute bottom-4 left-4 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
                  <GameStat icon={Target} value={score} label="Score" iconClassName="text-primary" />
-                 <GameStat icon={XCircle} value={`${MAX_WRONG_CLICKS - wrongClicks}`} label="Tries Left" iconClassName="text-destructive" />
+                 <GameStat icon={XCircle} value={`${Math.max(0, MAX_WRONG_CLICKS - wrongClicks)}`} label="Tries Left" iconClassName="text-destructive" />
              </div>
         </div>
         
@@ -243,7 +239,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
           >
             <div className="text-center text-white">
               <h2 className="text-5xl font-bold tracking-tighter">
-                {foundCount === differences.length ? "Perfect!" : "Time's Up!"}
+                {wrongClicks >= MAX_WRONG_CLICKS ? "Game Over" : foundCount === differences.length ? "Perfect!" : "Time's Up!"}
               </h2>
               <p className="mt-2 text-lg text-muted-foreground">Calculating your final score...</p>
             </div>
