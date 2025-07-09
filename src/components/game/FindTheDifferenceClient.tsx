@@ -96,9 +96,9 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     const target = e.target as HTMLElement;
     if (target.closest('[data-ishotspot="true"]')) return;
     
+    setWrongClicks(prev => prev + 1);
     setScore(prev => Math.max(0, prev - 20));
     setFeedback({ type: 'wrong', x: e.clientX, y: e.clientY });
-    setWrongClicks(prev => prev + 1);
   };
   
   const handleQuit = () => {
@@ -168,7 +168,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
       {/* Game Area */}
       <div className="flex w-full flex-1 flex-col items-stretch gap-4 p-4 pt-0 md:flex-row md:p-4">
         {/* Image 1 (Reference) */}
-        <div className="relative flex min-h-0 flex-1 flex-col justify-center overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
+        <div className="relative flex min-h-0 flex-1 cursor-crosshair flex-col justify-center overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50" onClick={handleWrongClick}>
              <Image 
                 src={competition.image} 
                 alt="Find the difference reference" 
@@ -177,7 +177,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
                 priority
                 data-ai-hint={competition.imageHint} 
              />
-             <div className="absolute bottom-4 left-4 flex flex-col gap-2">
+             <div className="absolute bottom-4 left-4 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
                  <GameStat icon={Target} value={score} label="Score" iconClassName="text-primary" />
                  <GameStat icon={XCircle} value={`${MAX_WRONG_CLICKS - wrongClicks}`} label="Tries Left" iconClassName="text-destructive" />
              </div>
@@ -207,7 +207,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
                     )}
                 </div>
             ))}
-             <div className="absolute bottom-4 right-4">
+             <div className="absolute bottom-4 right-4" onClick={(e) => e.stopPropagation()}>
                  <GameStat icon={Clock} value={`${timeLeft}s`} label="Time Left" iconClassName="text-accent" />
              </div>
         </div>
