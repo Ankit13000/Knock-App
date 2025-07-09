@@ -46,6 +46,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
   const [wrongClicks, setWrongClicks] = useState(0);
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'wrong'; x: number; y: number } | null>(null);
   const [isQuitConfirmOpen, setIsQuitConfirmOpen] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const foundCount = differences.filter(d => d.find).length;
 
@@ -57,12 +58,17 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
 
   // Main game loop for timer and win condition
   useEffect(() => {
-    if (isQuitConfirmOpen || wrongClicks >= MAX_WRONG_CLICKS) {
-      return; // Pause timer when dialog is open or game is lost
+    // Game already over or paused, do nothing.
+    if (isGameOver || isQuitConfirmOpen || wrongClicks >= MAX_WRONG_CLICKS) {
+      return;
     }
 
-    if (timeLeft <= 0 || (competition && foundCount === differences.length)) {
-      setTimeout(() => router.push(`/results?score=${score}`), 1500);
+    const isFinished = timeLeft <= 0 || (competition && foundCount === differences.length);
+
+    if (isFinished) {
+      setIsGameOver(true);
+      // Wait a bit before redirecting to show the final answers
+      setTimeout(() => router.push(`/results?score=${score}`), 4000); // 4-second delay
       return;
     }
 
@@ -71,7 +77,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, foundCount, router, competition, score, isQuitConfirmOpen, wrongClicks]);
+  }, [timeLeft, foundCount, router, competition, score, isQuitConfirmOpen, wrongClicks, isGameOver]);
   
   // Game over check for too many wrong clicks
   useEffect(() => {
@@ -144,7 +150,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
             </div>
             <AlertDialog open={isQuitConfirmOpen} onOpenChange={setIsQuitConfirmOpen}>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" disabled={isGameOver}>
                   <X className="h-6 w-6" />
                 </Button>
               </AlertDialogTrigger>
@@ -169,7 +175,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
       {/* Game Area */}
       <div className="flex w-full flex-1 flex-col items-stretch gap-4 p-4 pt-0 md:flex-row md:p-4">
         {/* Image 1 (Reference) */}
-        <div className="relative flex min-h-0 flex-1 cursor-crosshair flex-col justify-center overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50" onClick={handleWrongClick}>
+        <div className={cn("relative flex min-h-0 flex-1 flex-col justify-center overflow-hidden rounded-2xl shadow-2xl shadow-primary/20 ring-2 ring-primary/50", !isGameOver && "cursor-crosshair")} onClick={isGameOver ? undefined : handleWrongClick}>
              <Image 
                 src={competition.image} 
                 alt="Find the difference reference" 
@@ -185,7 +191,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
         </div>
         
         {/* Image 2 (Interactive) */}
-        <div className="relative min-h-0 w-full flex-1 cursor-crosshair overflow-hidden rounded-2xl shadow-2xl shadow-accent/20 ring-2 ring-accent/50" onClick={handleWrongClick}>
+        <div className={cn("relative min-h-0 w-full flex-1 overflow-hidden rounded-2xl shadow-2xl shadow-accent/20 ring-2 ring-accent/50", !isGameOver && "cursor-crosshair")} onClick={isGameOver ? undefined : handleWrongClick}>
             <Image 
                 src={competition.image} 
                 alt="Find the difference interactive" 
@@ -197,24 +203,52 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
             {differences.map(diff => (
                 <div key={diff.id}
                      data-ishotspot="true"
-                     className="absolute rounded-full transition-all duration-300"
+                     className={cn(
+                         "absolute rounded-full transition-all duration-300",
+                         isGameOver ? "pointer-events-none" : "cursor-pointer"
+                     )}
                      style={{ top: diff.top, left: diff.left, width: diff.size, height: diff.size, transform: 'translate(-50%, -50%)' }}
-                     onClick={(e) => { e.stopPropagation(); handleFound(diff.id, e); }}
+                     onClick={(e) => { 
+                        if (isGameOver) return;
+                        e.stopPropagation(); 
+                        handleFound(diff.id, e); 
+                    }}
                 >
-                    {diff.found && (
-                        <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                            <Circle className="w-full h-full text-green-400/90 stroke-[5px]" />
+                    {(diff.found || isGameOver) && (
+                        <motion.div 
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Circle className={cn(
+                                "w-full h-full stroke-[5px]",
+                                diff.found ? "text-green-400/90" : "text-yellow-400/90" // Green for found, yellow for missed
+                            )} />
                         </motion.div>
                     )}
                 </div>
             ))}
              <div className="absolute bottom-4 right-4" onClick={(e) => e.stopPropagation()}>
-                 <GameStat icon={Clock} value={`${timeLeft}s`} label="Time Left" iconClassName="text-accent" />
+                 <GameStat icon={Clock} value={isGameOver ? '0s' : `${timeLeft}s`} label="Time Left" iconClassName="text-accent" />
              </div>
         </div>
       </div>
 
       <AnimatePresence>
+        {isGameOver && (
+          <motion.div
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="text-center text-white">
+              <h2 className="text-5xl font-bold tracking-tighter">
+                {foundCount === differences.length ? "Perfect!" : "Time's Up!"}
+              </h2>
+              <p className="mt-2 text-lg text-muted-foreground">Calculating your final score...</p>
+            </div>
+          </motion.div>
+        )}
         {feedback && (
           <motion.div
             key={Date.now()}
