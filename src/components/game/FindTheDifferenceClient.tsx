@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -125,9 +126,9 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
       </div>
       
       {/* Game Area */}
-      <div className="flex-1 w-full p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="flex-1 w-full p-4 flex flex-col md:flex-row gap-4">
         {/* Image 1 (Reference) */}
-        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
+        <div className="relative w-full flex-1 min-h-0 rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 ring-2 ring-primary/50">
              <Image 
                 src={competition.image} 
                 alt="Find the difference reference" 
@@ -142,7 +143,7 @@ export function FindTheDifferenceClient({ competitionId }: { competitionId?: str
         </div>
         
         {/* Image 2 (Interactive) */}
-        <div className="relative w-full h-full cursor-crosshair rounded-2xl overflow-hidden shadow-2xl shadow-accent/20 ring-2 ring-accent/50" onClick={handleWrongClick}>
+        <div className="relative w-full flex-1 min-h-0 cursor-crosshair rounded-2xl overflow-hidden shadow-2xl shadow-accent/20 ring-2 ring-accent/50" onClick={handleWrongClick}>
             <Image 
                 src={competition.image} 
                 alt="Find the difference interactive" 
