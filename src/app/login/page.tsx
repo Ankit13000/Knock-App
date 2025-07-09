@@ -22,7 +22,7 @@ const GoogleIcon = () => (
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
@@ -42,8 +42,8 @@ export default function LoginPage() {
         <CardContent className="space-y-6">
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="email">Email or Mobile Number</Label>
-                <Input id="email" type="email" placeholder="you@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Label htmlFor="mobile-number">Mobile Number</Label>
+                <Input id="mobile-number" type="tel" placeholder="Your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
