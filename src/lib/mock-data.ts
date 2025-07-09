@@ -86,7 +86,7 @@ export const mockCompetitions: Competition[] = [
     status: 'Upcoming',
     participants: 2,
     totalSpots: 10,
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1611996575749-79a3a250f948?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxM3x8Z2FtZXxlbnwwfHx8fDE3NTIwNDk3Mjd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'city skyline quiz',
     startTime: 'Today at 8:00 PM'
   },
