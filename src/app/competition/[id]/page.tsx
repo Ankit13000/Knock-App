@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, ChevronLeft, Ticket, Trophy, Users, Clock } from 'lucide-react';
@@ -12,8 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import type { Transaction } from '@/lib/types';
 import { ToastAction } from '@/components/ui/toast';
 
-export default function CompetitionDetailPage({ params }: { params: { id: string } }) {
+export default function CompetitionDetailPage() {
   const router = useRouter();
+  const params = useParams();
   const { competitions, addTransaction, updateCompetition } = useApp();
   const { user, setUser } = useUser();
   const { toast } = useToast();
