@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap, LogIn } from 'lucide-react';
+import { Zap, LogIn, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -22,13 +23,35 @@ const GoogleIcon = () => (
 
 export default function LoginPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd validate credentials here
-    router.push('/home');
+    
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(mobileNumber)) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Mobile Number',
+        description: 'Please enter a valid 10-digit mobile number.',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Simulate API call to validate credentials and send OTP
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast({
+      title: 'OTP Sent!',
+      description: `A 6-digit code has been sent to ${mobileNumber}.`,
+    });
+    
+    router.push(`/otp?mobile=${mobileNumber}`);
   };
 
   return (
@@ -37,20 +60,25 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <Zap className="mx-auto h-12 w-12 text-primary" />
           <CardTitle className="text-3xl font-bold tracking-tighter">Welcome Back!</CardTitle>
-          <CardDescription>Log in to continue the fun.</CardDescription>
+          <CardDescription>Enter your credentials to receive a login OTP.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="mobile-number">Mobile Number</Label>
-                <Input id="mobile-number" type="tel" placeholder="Your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} />
+                <Input id="mobile-number" type="tel" placeholder="Your 10-digit mobile number" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} disabled={isLoading} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input id="password" type="password" placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
             </div>
-            <Button type="submit" className="w-full btn-gradient">
-                <LogIn className="mr-2 h-4 w-4" /> Log In
+            <Button type="submit" className="w-full btn-gradient" disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogIn className="mr-2 h-4 w-4" />
+              )}
+              {isLoading ? 'Sending OTP...' : 'Login with OTP'}
             </Button>
           </form>
           <div className="flex items-center space-x-2">
