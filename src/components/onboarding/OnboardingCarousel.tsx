@@ -11,6 +11,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,17 +37,69 @@ const onboardingSteps = [
   },
 ];
 
+const AnimatedBorder = () => (
+    <div className="absolute inset-0 pointer-events-none">
+        {/* Top */}
+        <motion.div
+            className="absolute top-0 left-0 h-1 bg-gradient-to-r from-primary to-accent"
+            initial={{ width: '0%' }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 0.75, ease: 'linear', delay: 0 }}
+        />
+        {/* Right */}
+        <motion.div
+            className="absolute top-0 right-0 w-1 bg-gradient-to-b from-accent to-primary"
+            initial={{ height: '0%' }}
+            animate={{ height: '100%' }}
+            transition={{ duration: 0.75, ease: 'linear', delay: 0.75 }}
+        />
+        {/* Bottom */}
+        <motion.div
+            className="absolute bottom-0 right-0 h-1 bg-gradient-to-l from-primary to-accent"
+            initial={{ width: '0%' }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 0.75, ease: 'linear', delay: 1.5 }}
+        />
+        {/* Left */}
+        <motion.div
+            className="absolute bottom-0 left-0 w-1 bg-gradient-to-t from-accent to-primary"
+            initial={{ height: '0%' }}
+            animate={{ height: '100%' }}
+            transition={{ duration: 0.75, ease: 'linear', delay: 2.25 }}
+        />
+    </div>
+);
+
+
 export function OnboardingCarousel() {
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true, stopOnLastSnap: true })
   );
 
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCurrent(api.selectedScrollSnap());
+    const handleSelect = () => {
+        setCurrent(api.selectedScrollSnap());
+    };
+    api.on('select', handleSelect);
+
+    return () => {
+        api.off('select', handleSelect);
+    };
+  }, [api]);
+
   return (
     <Carousel
+      setApi={setApi}
       plugins={[plugin.current]}
       className="w-full max-w-md"
-      onMouseEnter={plugin.current.stop}
-      onMouseLeave={plugin.current.reset}
     >
       <CarouselContent>
         {onboardingSteps.map((step, index) => (
@@ -63,36 +116,7 @@ export function OnboardingCarousel() {
                       className="aspect-video w-full object-cover"
                       data-ai-hint={step.imageHint}
                     />
-                    <div key={index} className="absolute inset-0 pointer-events-none">
-                        {/* Top */}
-                        <motion.div
-                            className="absolute top-0 left-0 h-1 bg-gradient-to-r from-primary to-accent"
-                            initial={{ width: '0%' }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: 0.75, ease: 'linear', delay: 0 }}
-                        />
-                        {/* Right */}
-                        <motion.div
-                            className="absolute top-0 right-0 w-1 bg-gradient-to-b from-accent to-primary"
-                            initial={{ height: '0%' }}
-                            animate={{ height: '100%' }}
-                            transition={{ duration: 0.75, ease: 'linear', delay: 0.75 }}
-                        />
-                        {/* Bottom */}
-                        <motion.div
-                            className="absolute bottom-0 right-0 h-1 bg-gradient-to-l from-primary to-accent"
-                            initial={{ width: '0%' }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: 0.75, ease: 'linear', delay: 1.5 }}
-                        />
-                        {/* Left */}
-                         <motion.div
-                            className="absolute bottom-0 left-0 w-1 bg-gradient-to-t from-accent to-primary"
-                            initial={{ height: '0%' }}
-                            animate={{ height: '100%' }}
-                            transition={{ duration: 0.75, ease: 'linear', delay: 2.25 }}
-                        />
-                    </div>
+                    {current === index && <AnimatedBorder />}
                   </div>
                   <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
                   <p className="mt-2 text-muted-foreground">{step.description}</p>
