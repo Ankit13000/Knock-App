@@ -56,7 +56,7 @@ export default function SignUpPage() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input id="password" type="password" placeholder="Create password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="coupon">Coupon Code (Optional)</Label>
