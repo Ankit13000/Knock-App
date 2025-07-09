@@ -3,18 +3,19 @@ import Image from 'next/image';
 import { Users, Ticket, Trophy } from 'lucide-react';
 import type { Competition } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type CompetitionCardProps = {
   competition: Competition;
 };
 
-const statusColors = {
-  Live: 'bg-positive/20 text-positive border-positive/30',
-  Upcoming: 'bg-primary/20 text-primary border-primary/30',
-  Results: 'bg-muted text-muted-foreground border-border',
+const statusVariants: Record<Competition['status'], BadgeProps['variant']> = {
+  Live: 'positive',
+  Upcoming: 'default',
+  Results: 'outline',
 };
 
 export function CompetitionCard({ competition }: CompetitionCardProps) {
@@ -31,7 +32,13 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
           className="aspect-video w-full object-cover"
           data-ai-hint={competition.imageHint}
         />
-        <Badge className={`absolute top-2 right-2 ${statusColors[competition.status]}`}>
+        <Badge
+          variant={statusVariants[competition.status]}
+          className={cn(
+            'absolute top-2 right-2',
+            competition.status === 'Live' && 'animate-pulse shadow-lg shadow-positive/50'
+          )}
+        >
           {competition.status}
         </Badge>
       </CardHeader>
